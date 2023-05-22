@@ -25,6 +25,7 @@
         <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
         <title>수신 메일 : 일반</title>
         <link type="text/css" rel="stylesheet" href="css/main_style.css" />
+        <link type="text/css" rel="stylesheet" href="css/categoryadd.css" />
         <script>
             <c:if test="${!empty msg}">
             alert("${msg}");
@@ -37,7 +38,9 @@
         <div id="sidebar">
             <jsp:include page="sidebar_menu.jsp" />
         </div>
-        <div class="dataTables_paginate paging_simple_numbers" id="dataTable_paginate">
+        <div id="main">
+            <h2 style="text-align: inherit;"> 메인 메뉴 </h2>
+            <div class="dataTables_paginate paging_simple_numbers" id="dataTable_paginate">
             <ul class="pagination">
             <!-- Previous 시작 -->            
             <c:choose>
@@ -66,8 +69,8 @@
             </c:choose>
         <!-- 메시지 삭제 링크를 누르면 바로 삭제되어 실수할 수 있음. 해결 방법은? -->
 
-            ${messageList}
                    </ul>
+                ${messageList}
         </div>
 
         <%@include file="footer.jspf"%>

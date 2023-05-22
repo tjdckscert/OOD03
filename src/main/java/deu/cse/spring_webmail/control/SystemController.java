@@ -4,6 +4,7 @@
  */
 package deu.cse.spring_webmail.control;
 
+import deu.cse.spring_webmail.Entity.Category;
 import deu.cse.spring_webmail.Entity.Inbox;
 import deu.cse.spring_webmail.Repository.CategoryRepository;
 import deu.cse.spring_webmail.Repository.InboxRepository;
@@ -174,7 +175,39 @@ public class SystemController {
         String list = NewMakeTable.makeCategoryTable(maillists, categoryName);
         model.addAttribute("messageList", messageList);
         model.addAttribute("list",categorylist);
+        model.addAttribute("size",categorylist.size());
         return "category_menu";
+    }
+    
+    @GetMapping("/category_menu_add")
+    public String categorymenuadd() {        
+        return "category_menu_add";
+    }
+    
+    @PostMapping("/category_menu_addcategory")
+    public String categorymenuadddo(Model model) {
+        String categoryName = request.getParameter("categoryName");
+        String useUserID =session.getAttribute("userid").toString();
+        log.info((new Category(null,categoryName,useUserID)).toString());
+        category.save(new Category(null,categoryName,useUserID));
+        model.addAttribute("msg","카테고리 추가가 완료 되었습니다.");
+        return "category_menu_add";        
+    }
+    
+    @GetMapping("/category_menu_delete")
+    public String categorymenudelete(Model model) {        
+        List<Category> categoryLists = category.findByUseUserID(session.getAttribute("userid").toString());
+        String catagoryList = NewMakeTable.makeCategoryNameTable(categoryLists);
+        model.addAttribute("catagoryList",catagoryList);
+        return "category_menu_delete";
+    }
+    
+    @GetMapping("/category_menu_deletecategory")
+    public String categorymenudeletedo(@RequestParam Integer Cindex,Model model) {
+        log.info(String.valueOf(Cindex));
+        category.deleteById(Cindex);        
+        model.addAttribute("msg","카테고리 삭제가 완료 되었습니다.");
+        return "redirect:category_menu_delete";
     }
 
     @GetMapping("/admin_menu")

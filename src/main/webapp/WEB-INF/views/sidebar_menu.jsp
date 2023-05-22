@@ -21,5 +21,9 @@
         <p> <a href="isread_mail"> 수신 여부 확인하기</a> </p> 
         <p> <a href="write_mail"> 메일 쓰기 </a> </p>                
         <p> <a href="login.do?menu=<%= CommandType.LOGOUT %>">로그아웃</a></p>
+        <br>
+        <br>       
+        <p> <a href="category_menu_add"> 카테고리 추가 </a> </p>                 
+        <p> <a href="category_menu_delete"> 카테고리 삭제 </a> </p> 
     </body>
 </html>

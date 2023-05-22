@@ -18,8 +18,8 @@ import org.springframework.stereotype.Repository;
  */
 @Repository
 public interface CategoryRepository extends JpaRepository<Category, Integer>{
-    @Query("select c from Category c where useUserID = :userid")
-    public Optional<List<Category>> findByUseUserID(@Param("userid")String useUserID);
+//    @Query("select c from Category c where useUserID = :userid")
+    public List<Category> findByUseUserID(String useUserID);
     
     @Query("select c.categoryName from Category c where useUserID = :userid")
     public List<String> findUserCategory(@Param("userid")String useUserID);

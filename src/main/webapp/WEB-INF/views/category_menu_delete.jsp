@@ -47,12 +47,7 @@
                     <h3 style="color: #F05B5B; font-size: x-large;"> 등록된 카테고리가 없습니다.</h3>
                 </c:when>
                 <c:otherwise>            
-                    <ul class="pagination">
-                    <c:forEach var="pNo" begin="1" end="${size}" step="1">
-                            <li><a href="/webmail/category_menu?categoryName=${list[pNo-1]}" aria-controls="dataTable" data-dt-idx="1" tabindex="0" class="page-link">${list[pNo-1]}</a></li>                    
-                    </c:forEach>
-                    </ul>
-                    ${messageList}
+                    ${catagoryList}
             </c:otherwise>        
             </c:choose>
         </div>

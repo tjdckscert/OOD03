@@ -7,18 +7,8 @@ package deu.cse.spring_webmail.model;
 import deu.cse.spring_webmail.Entity.Category;
 import deu.cse.spring_webmail.Entity.Inbox;
 import deu.cse.spring_webmail.Repository.InboxRepository;
-import jakarta.mail.FetchProfile;
-import jakarta.mail.Flags;
-import jakarta.mail.Folder;
-import jakarta.mail.Message;
-import jakarta.mail.Session;
-import jakarta.mail.Store;
 import java.util.List;
-import java.util.Properties;
-import javax.servlet.http.HttpServletRequest;
-import lombok.Getter;
 import lombok.NoArgsConstructor;
-import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 
@@ -53,9 +43,9 @@ public class NewMakeTable {
             Inbox inbox = mailists.get(i);
             String readMark="읽지 않음";
             if (inbox.getIsRead()) readMark="읽음";            
-            int a = inbox.getMessageBody().toString().indexOf("Subject: ");
-            int b = inbox.getMessageBody().toString().indexOf("MIME-Version: 1.0");    
-            String subject = inbox.getMessageBody().toString().substring(a+9, b-2);
+            int start = inbox.getMessageBody().toString().indexOf("Subject: ");
+            int end = inbox.getMessageBody().toString().indexOf("MIME-Version: 1.0");    
+            String subject = inbox.getMessageBody().toString().substring(start+9, end-2);
             buffer.append("<tr> "
                     + " <td id=no>" + (i + 1) + " </td> "
                     + " <td id=reciver>" + inbox.getRecipients()+"</td>"
@@ -92,9 +82,9 @@ public class NewMakeTable {
             Inbox inbox = mailists.get(i);
             String readMark="읽지 않음";
             if (inbox.getIsRead()) readMark="읽음";            
-            int a = inbox.getMessageBody().toString().indexOf("Subject: ");
-            int b = inbox.getMessageBody().toString().indexOf("MIME-Version: 1.0");    
-            String subject = inbox.getMessageBody().toString().substring(a+9, b-2);
+            int start = inbox.getMessageBody().toString().indexOf("Subject: ");
+            int end = inbox.getMessageBody().toString().indexOf("MIME-Version: 1.0");    
+            String subject = inbox.getMessageBody().toString().substring(start+9, end-2);
             buffer.append("<tr> "
                     + " <td id=no>" + (i + 1) + " </td> "
                     + " <td id=reciver>" + inbox.getRecipients()+"</td>"
@@ -127,9 +117,9 @@ public class NewMakeTable {
             Inbox inbox = mailists.get(i);
             String readMark="읽지 않음";
             if (inbox.getIsRead()) readMark="읽음";            
-            int a = inbox.getMessageBody().toString().indexOf("Subject: ");
-            int b = inbox.getMessageBody().toString().indexOf("MIME-Version: 1.0");
-            String subject = inbox.getMessageBody().toString().substring(a+9, b-2);            
+            int start = inbox.getMessageBody().toString().indexOf("Subject: ");
+            int end = inbox.getMessageBody().toString().indexOf("MIME-Version: 1.0");
+            String subject = inbox.getMessageBody().toString().substring(start+9, end-2);            
             
             log.info("value = "+String.valueOf(categorylist.contains(subject)));            
             if (categorylist.contains(subject)) {
@@ -169,9 +159,9 @@ public class NewMakeTable {
             Inbox inbox = mailists.get(i);
             String readMark="읽지 않음";
             if (inbox.getIsRead()) readMark="읽음";            
-            int a = inbox.getMessageBody().toString().indexOf("Subject: ");
-            int b = inbox.getMessageBody().toString().indexOf("MIME-Version: 1.0");
-            String subject = inbox.getMessageBody().toString().substring(a+9, b-2);            
+            int start = inbox.getMessageBody().toString().indexOf("Subject: ");
+            int end = inbox.getMessageBody().toString().indexOf("MIME-Version: 1.0");
+            String subject = inbox.getMessageBody().toString().substring(start+9, end-2);            
             
             log.info("value = "+String.valueOf(categoryName.contains(subject)));            
             if (categoryName.contains(subject)) {
@@ -187,6 +177,27 @@ public class NewMakeTable {
                     + " <td id=is read>"+ readMark+"</td>"
                     + " </tr>");
             }
+            }
+        buffer.append("</table>");
+        return buffer.toString();
+//        return "MessageFormatter 테이블 결과";
+    }
+    
+    public static String makeCategoryNameTable(List<Category> categorylist) {
+        StringBuilder buffer = new StringBuilder();
+        // 메시지 제목 보여주기
+        buffer.append("<table>");  // table start
+        buffer.append("<tr> "                
+                + " <th> 카테고리명 </td>"
+                + " <th> 삭제 </td>   "
+                + " </tr>");
+        for (Category category : categorylist) {
+                    buffer.append("<tr> "
+                    + " <td id=categoryName>" +category.getCategoryName()+"</td>"
+                    + " <td id=delete>"
+                    + "<a href=category_menu_deletecategory"
+                    + "?Cindex=" + category.getCindex() + "> 삭제 </a>" + "</td>"
+                    + " </tr>");
             }
         buffer.append("</table>");
         return buffer.toString();

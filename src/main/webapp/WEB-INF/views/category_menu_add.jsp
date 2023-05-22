@@ -23,7 +23,8 @@
 <html>
     <head>
         <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
-        <title>주메뉴 화면</title>
+        <title>카테고리 추가</title>
+        <link type="text/css" rel="stylesheet" href="css/button.css" />
         <link type="text/css" rel="stylesheet" href="css/main_style.css" />
         <link type="text/css" rel="stylesheet" href="css/categoryadd.css" />
         <script>
@@ -34,29 +35,24 @@
     </head>
     <body>
         <%@include file="header.jspf"%>
-
+        
         <div id="sidebar">
             <jsp:include page="sidebar_menu.jsp" />
         </div>
-        
-        <!-- 메시지 삭제 링크를 누르면 바로 삭제되어 실수할 수 있음. 해결 방법은? -->
-        <div id="main">
-            <h2 style="text-align: inherit;">카테고리 목록 </h2>
-            <c:choose>
-                <c:when test="${size eq 0}">
-                    <h3 style="color: #F05B5B; font-size: x-large;"> 등록된 카테고리가 없습니다.</h3>
-                </c:when>
-                <c:otherwise>            
-                    <ul class="pagination">
-                    <c:forEach var="pNo" begin="1" end="${size}" step="1">
-                            <li><a href="/webmail/category_menu?categoryName=${list[pNo-1]}" aria-controls="dataTable" data-dt-idx="1" tabindex="0" class="page-link">${list[pNo-1]}</a></li>                    
-                    </c:forEach>
-                    </ul>
-                    ${messageList}
-            </c:otherwise>        
-            </c:choose>
+        <div class="container" style="width: 400px;">
+            <h2 style="text-align: inherit;">카테고리 추가</h2> 
+            <form method="POST" action="category_menu_addcategory">
+                <div class="group">      
+                    <input type="text" name="categoryName" required >
+                    <span class="highlight"></span>
+                    <span class="bar"></span>
+                    <label>카테고리 이름</label>
+                </div>
+                <!--<a href="" class="btn-gradient green mini">추가</a>-->    
+                <input type="submit" class="btn-gradient green mini" value="추가">
+            </form>
         </div>
-
         <%@include file="footer.jspf"%>
     </body>
 </html>
+

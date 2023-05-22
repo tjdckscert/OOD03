@@ -4,6 +4,8 @@
  */
 package deu.cse.spring_webmail.control;
 
+import deu.cse.spring_webmail.Entity.Inbox;
+import deu.cse.spring_webmail.Repository.InboxRepository;
 import deu.cse.spring_webmail.model.Pop3Agent;
 import jakarta.mail.internet.MimeUtility;
 import java.io.File;
@@ -47,13 +49,19 @@ public class ReadController {
     private HttpSession session;
     @Autowired
     private HttpServletRequest request;
+    @Autowired
+    private InboxRepository InboxRepository;
     @Value("${file.download_folder}")
     private String DOWNLOAD_FOLDER;
 
     @GetMapping("/show_message")
-    public String showMessage(@RequestParam Integer msgid, Model model) {
+    public String showMessage(@RequestParam Integer msgid,@RequestParam Boolean isread, @RequestParam String mailIndex, Model model) {
         log.debug("download_folder = {}", DOWNLOAD_FOLDER);
-        
+        if (!isread) {
+            Inbox inbox = InboxRepository.findById(Integer.parseInt(mailIndex)).orElse(null);
+            inbox.setIsRead(true);
+            InboxRepository.save(inbox);
+        }
         Pop3Agent pop3 = new Pop3Agent();
         pop3.setHost((String) session.getAttribute("host"));
         pop3.setUserid((String) session.getAttribute("userid"));
