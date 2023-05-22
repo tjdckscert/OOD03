@@ -1,7 +1,7 @@
 <%-- 
     Document   : main_menu
     Created on : 2022. 6. 10., 오후 3:15:45
-    Author     : skylo
+    Author     : tjdckscert
 --%>
 
 <%@page contentType="text/html" pageEncoding="UTF-8"%>
@@ -23,7 +23,7 @@
 <html>
     <head>
         <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
-        <title>주메뉴 화면</title>
+        <title>수신 메일 : 일반</title>
         <link type="text/css" rel="stylesheet" href="css/main_style.css" />
         <script>
             <c:if test="${!empty msg}">
@@ -37,10 +37,37 @@
         <div id="sidebar">
             <jsp:include page="sidebar_menu.jsp" />
         </div>
+        <div class="dataTables_paginate paging_simple_numbers" id="dataTable_paginate">
+            <ul class="pagination">
+            <!-- Previous 시작 -->            
+            <c:choose>
+			<c:when test="${list.startPage<6}">
+                                <li><a href="/webmail/main_menu?currentPage=1" aria-controls="dataTable" data-dt-idx="0" tabindex="0" class="page-link">Previous</a></li>
+			</c:when>
+			<c:otherwise>
+				<li><a href="/webmail/main_menu?currentPage=${list.startPage-5 }" aria-controls="dataTable" data-dt-idx="0" tabindex="0" class="page-link">Previous</a></li>
+			</c:otherwise>
+            </c:choose>
 
+            <!-- Previous 끝 -->
+            <!-- Page번호 시작 -->
+            <c:forEach var="pNo" begin="${list.startPage }" end="${list.endPage }" step="1">
+                    <li class="paginate_button page-item  <c:if test='${param.currentPage eq pNo }'>active</c:if>"><a href="/webmail/main_menu?currentPage=${pNo }" aria-controls="dataTable" data-dt-idx="1" tabindex="0" class="page-link">${pNo }</a></li>                    
+            </c:forEach>
+            <!-- Page번호 끝 -->
+            <!-- Next 시작 -->
+            <c:choose>
+			<c:when test="${list.endPage>=list.totalPages }">
+                                <li><a href="/webmail/main_menu?currentPage=${list.startPage}" aria-controls="dataTable" data-dt-idx="7" tabindex="0" class="page-link">Next</a></li>
+			</c:when>
+			<c:otherwise>
+				<li><a href="/webmail/main_menu?currentPage=${list.startPage+5 }" aria-controls="dataTable" data-dt-idx="7" tabindex="0" class="page-link">Next</a></li>
+			</c:otherwise>
+            </c:choose>
         <!-- 메시지 삭제 링크를 누르면 바로 삭제되어 실수할 수 있음. 해결 방법은? -->
-        <div id="main">
+
             ${messageList}
+                   </ul>
         </div>
 
         <%@include file="footer.jspf"%>
