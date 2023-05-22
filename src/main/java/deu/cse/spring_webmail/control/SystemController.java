@@ -138,75 +138,74 @@ public class SystemController {
     }
 
     @GetMapping("/main_menu")
-    public String mainmenu(Model model,@RequestParam(defaultValue="1") int currentPage) {     
-        List<Inbox> maillists = inbox.findByRecipientsOrderByLastUpdated(session.getAttribute("userid").toString()+"@localhost");
+    public String mainmenu(Model model, @RequestParam(defaultValue = "1") int currentPage) {
+        List<Inbox> maillists = inbox.findByRecipientsOrderByLastUpdated(session.getAttribute("userid").toString() + "@localhost");
         String messageList = NewMakeTable.makeMainTable(maillists, currentPage);
-        int total = maillists.size();        
-        model.addAttribute("list", new MailPageing(total, currentPage, 7, 5, maillists));		
-	model.addAttribute("total", total); 
+        int total = maillists.size();
+        model.addAttribute("list", new MailPageing(total, currentPage, 7, 5, maillists));
+        model.addAttribute("total", total);
         model.addAttribute("messageList", messageList);
         return "main_menu";
     }
-    
+
     @GetMapping("/isread_mail")
-    public String isreadmenu(Model model, @RequestParam(defaultValue="1") int currentPage) {
-        List<Inbox> maillist = inbox.findBySenderOrderByLastUpdated((String) session.getAttribute("userid")+"@localhost");
-        String messageList = NewMakeTable.makeIsReadTable(maillist,currentPage);
+    public String isreadmenu(Model model, @RequestParam(defaultValue = "1") int currentPage) {
+        List<Inbox> maillist = inbox.findBySenderOrderByLastUpdated((String) session.getAttribute("userid") + "@localhost");
+        String messageList = NewMakeTable.makeIsReadTable(maillist, currentPage);
         int total = maillist.size();
-        log.info(String.valueOf(total)+" is size");
+        log.info(String.valueOf(total) + " is size");
         model.addAttribute("list", new MailPageing(total, currentPage, 7, 5, maillist));
         model.addAttribute("total", total);
         model.addAttribute("messageList", messageList);
         return "isread_mail";
     }
-    
+
     @GetMapping("/category_menu")
-    public String categorymenu(Model model, @RequestParam(defaultValue="") String categoryName) {
-        List<Inbox> maillists = inbox.findByRecipientsOrderByLastUpdated(session.getAttribute("userid").toString()+"@localhost");
+    public String categorymenu(Model model, @RequestParam(defaultValue = "") String categoryName) {
+        List<Inbox> maillists = inbox.findByRecipientsOrderByLastUpdated(session.getAttribute("userid").toString() + "@localhost");
         List<String> categorylist = category.findUserCategory(session.getAttribute("userid").toString());
         //log.info(String.valueOf(categorylist.size()));
-        String messageList="";
+        String messageList = "";
         if (categoryName.equals("")) {
             messageList = NewMakeTable.makeCategoryTable(maillists, categorylist);
-        }
-        else{
+        } else {
             messageList = NewMakeTable.makeCategoryTable(maillists, categoryName);
         }
         String list = NewMakeTable.makeCategoryTable(maillists, categoryName);
         model.addAttribute("messageList", messageList);
-        model.addAttribute("list",categorylist);
-        model.addAttribute("size",categorylist.size());
+        model.addAttribute("list", categorylist);
+        model.addAttribute("size", categorylist.size());
         return "category_menu";
     }
-    
+
     @GetMapping("/category_menu_add")
-    public String categorymenuadd() {        
+    public String categorymenuadd() {
         return "category_menu_add";
     }
-    
+
     @PostMapping("/category_menu_addcategory")
     public String categorymenuadddo(Model model) {
         String categoryName = request.getParameter("categoryName");
-        String useUserID =session.getAttribute("userid").toString();
-        log.info((new Category(null,categoryName,useUserID)).toString());
-        category.save(new Category(null,categoryName,useUserID));
-        model.addAttribute("msg","카테고리 추가가 완료 되었습니다.");
-        return "category_menu_add";        
+        String useUserID = session.getAttribute("userid").toString();
+        log.info((new Category(null, categoryName, useUserID)).toString());
+        category.save(new Category(null, categoryName, useUserID));
+        model.addAttribute("msg", "카테고리 추가가 완료 되었습니다.");
+        return "category_menu_add";
     }
-    
+
     @GetMapping("/category_menu_delete")
-    public String categorymenudelete(Model model) {        
+    public String categorymenudelete(Model model) {
         List<Category> categoryLists = category.findByUseUserID(session.getAttribute("userid").toString());
         String catagoryList = NewMakeTable.makeCategoryNameTable(categoryLists);
-        model.addAttribute("catagoryList",catagoryList);
+        model.addAttribute("catagoryList", catagoryList);
         return "category_menu_delete";
     }
-    
+
     @GetMapping("/category_menu_deletecategory")
-    public String categorymenudeletedo(@RequestParam Integer Cindex,Model model) {
+    public String categorymenudeletedo(@RequestParam Integer Cindex, Model model) {
         log.info(String.valueOf(Cindex));
-        category.deleteById(Cindex);        
-        model.addAttribute("msg","카테고리 삭제가 완료 되었습니다.");
+        category.deleteById(Cindex);
+        model.addAttribute("msg", "카테고리 삭제가 완료 되었습니다.");
         return "redirect:category_menu_delete";
     }
 
@@ -297,9 +296,9 @@ public class SystemController {
 
     /**
      * https://34codefactory.wordpress.com/2019/06/16/how-to-display-image-in-jsp-using-spring-code-factory/
-     * 
+     *
      * @param imageName
-     * @return 
+     * @return
      */
     @RequestMapping(value = "/get_image/{imageName}")
     @ResponseBody
@@ -319,7 +318,7 @@ public class SystemController {
         byte[] imageInByte;
         try {
             byteArrayOutputStream = new ByteArrayOutputStream();
-            bufferedImage = ImageIO.read(new File(folderPath + File.separator + imageName) );
+            bufferedImage = ImageIO.read(new File(folderPath + File.separator + imageName));
             String format = imageName.substring(imageName.lastIndexOf(".") + 1);
             ImageIO.write(bufferedImage, format, byteArrayOutputStream);
             byteArrayOutputStream.flush();
@@ -334,4 +333,52 @@ public class SystemController {
         return null;
     }
 
+    /**
+     * 회원가입 이동
+     *
+     * @return 회원가입 페이지
+     */
+    @GetMapping("/sign_up")
+    public String signUp() {
+        return "/sign_up";
+    }
+    
+    /**
+     * 회원 가입 수행
+     *
+     * @param id 아이디
+     * @param pw 비밀번호
+     * @param check_pw 비밀번호 확인
+     * @return
+     */
+    @PostMapping("/signup.do")
+    public String signUpDo(@RequestParam String id, @RequestParam String pw, @RequestParam String check_pw, RedirectAttributes attrs) {
+        log.debug("signup.do: id = {}, password = {}, check-password = {}, port = {}",
+                id, pw, check_pw, JAMES_CONTROL_PORT);
+
+        String url = "redirect:/";
+        try {
+
+            String cwd = ctx.getRealPath(".");
+            UserAdminAgent agent = new UserAdminAgent(JAMES_HOST, JAMES_CONTROL_PORT, cwd,
+                    ROOT_ID, ROOT_PASSWORD, ADMINISTRATOR);
+            
+            if (pw.equals(check_pw)) {
+                if (agent.addUser(id, pw)) {
+                    attrs.addFlashAttribute("msg", String.format("회원가입에 성공하였습니다."));
+                } else {
+                    attrs.addFlashAttribute("msg", String.format("이미 사용자가 존재합니다."));
+                    url += "sign_up";
+                }
+            } else {
+                attrs.addFlashAttribute("msg", String.format("비밀번호가 일치하지 않습니다."));
+                url += "sign_up";
+            }
+
+        } catch (Exception ex) {
+            log.error("sign_up.do: 시스템 접속에 실패했습니다. 예외 = {}", ex.getMessage());
+        }
+
+        return url;
+    }
 }
