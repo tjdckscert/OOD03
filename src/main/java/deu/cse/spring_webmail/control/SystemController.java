@@ -53,6 +53,8 @@ public class SystemController {
     private HttpServletRequest request;
     @Autowired
     private InboxRepository inbox;
+    @Autowired
+    private CategoryRepository category;
 
     @Value("${root.id}")
     private String ROOT_ID;
@@ -155,6 +157,24 @@ public class SystemController {
         model.addAttribute("total", total);
         model.addAttribute("messageList", messageList);
         return "isread_mail";
+    }
+    
+    @GetMapping("/category_menu")
+    public String categorymenu(Model model, @RequestParam(defaultValue="") String categoryName) {
+        List<Inbox> maillists = inbox.findByRecipientsOrderByLastUpdated(session.getAttribute("userid").toString()+"@localhost");
+        List<String> categorylist = category.findUserCategory(session.getAttribute("userid").toString());
+        //log.info(String.valueOf(categorylist.size()));
+        String messageList="";
+        if (categoryName.equals("")) {
+            messageList = NewMakeTable.makeCategoryTable(maillists, categorylist);
+        }
+        else{
+            messageList = NewMakeTable.makeCategoryTable(maillists, categoryName);
+        }
+        String list = NewMakeTable.makeCategoryTable(maillists, categoryName);
+        model.addAttribute("messageList", messageList);
+        model.addAttribute("list",categorylist);
+        return "category_menu";
     }
 
     @GetMapping("/admin_menu")

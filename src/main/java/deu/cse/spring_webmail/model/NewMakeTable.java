@@ -109,4 +109,87 @@ public class NewMakeTable {
         return buffer.toString();
 //        return "MessageFormatter 테이블 결과";
     }
+    public static String makeCategoryTable(List<Inbox> mailists,  List<String> categorylist) {
+        StringBuilder buffer = new StringBuilder();
+        // 메시지 제목 보여주기
+        buffer.append("<table>");  // table start
+        buffer.append("<tr> "                
+                + " <th> 보낸 사람 </td>"
+                + " <th> 제목 </td>     "
+                + " <th> 보낸 날짜 </td>   "
+                + " <th> 삭제 </td>   "                
+                + " <th> 읽음 여부 </td>   "
+                + " </tr>");
+        for (int i = 0; i < mailists.size(); i++) {
+            if (i>=mailists.size()) {
+                break;
+            }
+            Inbox inbox = mailists.get(i);
+            String readMark="읽지 않음";
+            if (inbox.getIsRead()) readMark="읽음";            
+            int a = inbox.getMessageBody().toString().indexOf("Subject: ");
+            int b = inbox.getMessageBody().toString().indexOf("MIME-Version: 1.0");
+            String subject = inbox.getMessageBody().toString().substring(a+9, b-2);            
+            
+            log.info("value = "+String.valueOf(categorylist.contains(subject)));            
+            if (categorylist.contains(subject)) {
+                    buffer.append("<tr> "                    
+                    + " <td id=reciver>" + inbox.getRecipients()+"</td>"
+                    + " <td id=subject> "
+                    + " <a href=show_message?msgid=" + (i + 1) + "&isread="+inbox.getIsRead()+"&mailIndex="+mailists.get(i).getMindex()+" title=\"메일 보기\"> "
+                    + subject +"</td>"
+                    + " <td id=date>" + inbox.getLastUpdated()+ "</td>"
+                    + " <td id=delete>"
+                    + "<a href=delete_mail.do"
+                    + "?msgid=" + (i + 1) + "> 삭제 </a>" + "</td>"
+                    + " <td id=is read>"+ readMark+"</td>"
+                    + " </tr>");
+            }
+            }
+        buffer.append("</table>");
+        return buffer.toString();
+//        return "MessageFormatter 테이블 결과";
+    }
+    
+    public static String makeCategoryTable(List<Inbox> mailists, String categoryName) {
+        StringBuilder buffer = new StringBuilder();
+        // 메시지 제목 보여주기
+        buffer.append("<table>");  // table start
+        buffer.append("<tr> "                
+                + " <th> 보낸 사람 </td>"
+                + " <th> 제목 </td>     "
+                + " <th> 보낸 날짜 </td>   "
+                + " <th> 삭제 </td>   "                
+                + " <th> 읽음 여부 </td>   "
+                + " </tr>");
+        for (int i = 0; i < mailists.size(); i++) {
+            if (i>=mailists.size()) {
+                break;
+            }
+            Inbox inbox = mailists.get(i);
+            String readMark="읽지 않음";
+            if (inbox.getIsRead()) readMark="읽음";            
+            int a = inbox.getMessageBody().toString().indexOf("Subject: ");
+            int b = inbox.getMessageBody().toString().indexOf("MIME-Version: 1.0");
+            String subject = inbox.getMessageBody().toString().substring(a+9, b-2);            
+            
+            log.info("value = "+String.valueOf(categoryName.contains(subject)));            
+            if (categoryName.contains(subject)) {
+                    buffer.append("<tr> "                    
+                    + " <td id=reciver>" + inbox.getRecipients()+"</td>"
+                    + " <td id=subject> "
+                    + " <a href=show_message?msgid=" + (i + 1) + "&isread="+inbox.getIsRead()+"&mailIndex="+mailists.get(i).getMindex()+" title=\"메일 보기\"> "
+                    + subject +"</td>"
+                    + " <td id=date>" + inbox.getLastUpdated()+ "</td>"
+                    + " <td id=delete>"
+                    + "<a href=delete_mail.do"
+                    + "?msgid=" + (i + 1) + "> 삭제 </a>" + "</td>"
+                    + " <td id=is read>"+ readMark+"</td>"
+                    + " </tr>");
+            }
+            }
+        buffer.append("</table>");
+        return buffer.toString();
+//        return "MessageFormatter 테이블 결과";
+    }
 }
