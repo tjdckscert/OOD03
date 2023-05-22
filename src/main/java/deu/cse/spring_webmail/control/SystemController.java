@@ -144,6 +144,18 @@ public class SystemController {
         model.addAttribute("messageList", messageList);
         return "main_menu";
     }
+    
+    @GetMapping("/isread_mail")
+    public String isreadmenu(Model model, @RequestParam(defaultValue="1") int currentPage) {
+        List<Inbox> maillist = inbox.findBySenderOrderByLastUpdated((String) session.getAttribute("userid")+"@localhost");
+        String messageList = NewMakeTable.makeIsReadTable(maillist,currentPage);
+        int total = maillist.size();
+        log.info(String.valueOf(total)+" is size");
+        model.addAttribute("list", new MailPageing(total, currentPage, 7, 5, maillist));
+        model.addAttribute("total", total);
+        model.addAttribute("messageList", messageList);
+        return "isread_mail";
+    }
 
     @GetMapping("/admin_menu")
     public String adminMenu(Model model) {
