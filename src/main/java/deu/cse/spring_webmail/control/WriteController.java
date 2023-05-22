@@ -4,6 +4,8 @@
  */
 package deu.cse.spring_webmail.control;
 
+import deu.cse.spring_webmail.Entity.IsRead;
+import deu.cse.spring_webmail.Repository.IsReadRepository;
 import deu.cse.spring_webmail.model.SmtpAgent;
 import java.io.BufferedOutputStream;
 import java.io.File;
@@ -16,6 +18,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.PropertySource;
 import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -35,6 +38,8 @@ public class WriteController {
     private String UPLOAD_FOLDER;
     @Value("${file.max_size}")
     private String MAX_SIZE;
+    @Autowired
+    private IsReadRepository isreadrepository;
     
     @Autowired
     private ServletContext ctx;
@@ -42,8 +47,9 @@ public class WriteController {
     private HttpSession session;
     
     @GetMapping("/write_mail")
-    public String writeMail() {
+    public String writeMail(Model model) {
         log.debug("write_mail called...");
+        model.addAttribute("msg","메일 작성을 시작합니다. 메일의 내용은 200자를 넘을 수 없습니다.");
         session.removeAttribute("sender");  // 220612 LJM - 메일 쓰기 시는 
         return "write_mail/write_mail";
     }
@@ -52,7 +58,17 @@ public class WriteController {
     public String writeMailDo(@RequestParam String to, @RequestParam String cc, 
             @RequestParam String subj, @RequestParam String body, 
             @RequestParam(name="file1") MultipartFile upFile,
-            RedirectAttributes attrs) {
+            RedirectAttributes attrs, Model model) {
+        String url ="";
+        if (body.length()>200) {
+            model.addAttribute("msg","전송실패 : 메일의 글자 수는 200자를 넘을 수 없습니다.");            
+            model.addAttribute("body", body);
+            model.addAttribute("to", to);
+            model.addAttribute("cc", cc);
+            model.addAttribute("subject", subj);
+//            return "write_mail/write_mail";
+         return "write_mail/write_mail";
+        }
         log.debug("write_mail.do: to = {}, cc = {}, subj = {}, body = {}, file1 = {}",
                 to, cc, subj, body, upFile.getOriginalFilename());
         // FormParser 클래스의 기능은 매개변수로 모두 넘어오므로 더이상 필요 없음.
@@ -68,6 +84,15 @@ public class WriteController {
             }
         }
         boolean sendSuccessful = sendMessage(to, cc, subj, body, upFile);
+        String userid = (String) session.getAttribute("userid");
+        isreadrepository.save(IsRead.builder()
+                .messageBody(body)
+                .sender(userid)
+                .reciver(to)
+                .isRead(false)
+                .build());
+        
+            
         if (sendSuccessful) {
             attrs.addFlashAttribute("msg", "메일 전송이 성공했습니다.");
         } else {
