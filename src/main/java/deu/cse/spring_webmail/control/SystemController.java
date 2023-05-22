@@ -4,6 +4,11 @@
  */
 package deu.cse.spring_webmail.control;
 
+import deu.cse.spring_webmail.Entity.Inbox;
+import deu.cse.spring_webmail.Repository.CategoryRepository;
+import deu.cse.spring_webmail.Repository.InboxRepository;
+import deu.cse.spring_webmail.model.MailPageing;
+import deu.cse.spring_webmail.model.NewMakeTable;
 import deu.cse.spring_webmail.model.Pop3Agent;
 import deu.cse.spring_webmail.model.UserAdminAgent;
 import java.awt.image.BufferedImage;
@@ -46,6 +51,8 @@ public class SystemController {
     private HttpSession session;
     @Autowired
     private HttpServletRequest request;
+    @Autowired
+    private InboxRepository inbox;
 
     @Value("${root.id}")
     private String ROOT_ID;
@@ -128,13 +135,12 @@ public class SystemController {
     }
 
     @GetMapping("/main_menu")
-    public String mainmenu(Model model) {
-        Pop3Agent pop3 = new Pop3Agent();
-        pop3.setHost((String) session.getAttribute("host"));
-        pop3.setUserid((String) session.getAttribute("userid"));
-        pop3.setPassword((String) session.getAttribute("password"));
-
-        String messageList = pop3.getMessageList();
+    public String mainmenu(Model model,@RequestParam(defaultValue="1") int currentPage) {     
+        List<Inbox> maillists = inbox.findByRecipientsOrderByLastUpdated(session.getAttribute("userid").toString()+"@localhost");
+        String messageList = NewMakeTable.makeMainTable(maillists, currentPage);
+        int total = maillists.size();        
+        model.addAttribute("list", new MailPageing(total, currentPage, 7, 5, maillists));		
+	model.addAttribute("total", total); 
         model.addAttribute("messageList", messageList);
         return "main_menu";
     }
