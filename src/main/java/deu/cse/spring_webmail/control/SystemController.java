@@ -342,4 +342,43 @@ public class SystemController {
     public String signUp() {
         return "/sign_up";
     }
+    
+    /**
+     * 회원 가입 수행
+     *
+     * @param id 아이디
+     * @param pw 비밀번호
+     * @param check_pw 비밀번호 확인
+     * @return
+     */
+    @PostMapping("/signup.do")
+    public String signUpDo(@RequestParam String id, @RequestParam String pw, @RequestParam String check_pw, RedirectAttributes attrs) {
+        log.debug("signup.do: id = {}, password = {}, check-password = {}, port = {}",
+                id, pw, check_pw, JAMES_CONTROL_PORT);
+
+        String url = "redirect:/";
+        try {
+
+            String cwd = ctx.getRealPath(".");
+            UserAdminAgent agent = new UserAdminAgent(JAMES_HOST, JAMES_CONTROL_PORT, cwd,
+                    ROOT_ID, ROOT_PASSWORD, ADMINISTRATOR);
+            
+            if (pw.equals(check_pw)) {
+                if (agent.addUser(id, pw)) {
+                    attrs.addFlashAttribute("msg", String.format("회원가입에 성공하였습니다."));
+                } else {
+                    attrs.addFlashAttribute("msg", String.format("이미 사용자가 존재합니다."));
+                    url += "sign_up";
+                }
+            } else {
+                attrs.addFlashAttribute("msg", String.format("비밀번호가 일치하지 않습니다."));
+                url += "sign_up";
+            }
+
+        } catch (Exception ex) {
+            log.error("sign_up.do: 시스템 접속에 실패했습니다. 예외 = {}", ex.getMessage());
+        }
+
+        return url;
+    }
 }
