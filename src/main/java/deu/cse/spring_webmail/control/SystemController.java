@@ -342,7 +342,7 @@ public class SystemController {
     public String signUp() {
         return "/sign_up";
     }
-    
+
     /**
      * 회원 가입 수행
      *
@@ -362,7 +362,7 @@ public class SystemController {
             String cwd = ctx.getRealPath(".");
             UserAdminAgent agent = new UserAdminAgent(JAMES_HOST, JAMES_CONTROL_PORT, cwd,
                     ROOT_ID, ROOT_PASSWORD, ADMINISTRATOR);
-            
+
             if (pw.equals(check_pw)) {
                 if (agent.addUser(id, pw)) {
                     attrs.addFlashAttribute("msg", String.format("회원가입에 성공하였습니다."));
@@ -379,6 +379,58 @@ public class SystemController {
             log.error("sign_up.do: 시스템 접속에 실패했습니다. 예외 = {}", ex.getMessage());
         }
 
+        return url;
+    }
+
+    /**
+     * 관리자 비밀번호 변경 페이지 이동
+     */
+    @GetMapping("/admin_modify_user")
+    public String adminModifyUser(Model model) {
+        log.debug("admin_modify_user called");
+        return "admin/admin_modify_user";
+    }
+
+    /**
+     * 사용자 비밀번호 변경 페이지 이동
+     */
+    @GetMapping("/modify_user")
+    public String modifyUser(Model model) {
+        log.debug("modify_user called");
+        return "/modify_user";
+    }
+
+    
+    /**
+     * 비밀번호 변경 수행
+     * @param password 비밀번호
+     * @param confirmPassword 비밀번호 확인
+     * @return 리다이렉트
+     */
+    @PostMapping("modify_user.do")
+    public String modifyUserDo(@RequestParam("password") String password, @RequestParam("confirmPassword") String confirmPassword, RedirectAttributes attrs) {
+        String userId = (String) session.getAttribute("userid");
+        
+        String url = userId.equals("admin") ? "redirect:/admin_menu" : "redirect:/main_menu";
+        
+        String msg;
+        if (!password.equals(confirmPassword) || password.matches("\\s*") || confirmPassword.matches("\\s*")) {
+            msg = "비밀번호와 확인 비밀번호가 일치하지 않습니다.";
+        } else {
+            try {
+                String cwd = ctx.getRealPath(".");
+                UserAdminAgent agent = new UserAdminAgent(JAMES_HOST, JAMES_CONTROL_PORT, cwd, ROOT_ID, ROOT_PASSWORD, ADMINISTRATOR);
+                agent.setPassword(userId, password);
+                msg = String.format("사용자(%s) 비밀번호를 변경하였습니다. 다시 로그인 해주세요", userId);
+                session.invalidate();
+                url = "redirect:/";  // redirect: 반드시 넣어야만 컨텍스트 루트로 갈 수 있음
+            } catch (Exception ex) {
+                msg = String.format("사용자(%s) 비밀번호 변경에 실패하였습니다.", userId);
+                log.error("modify_user.do : 예외 = {}", ex);
+            }
+        }
+
+        attrs.addFlashAttribute("msg", msg);
         return url;
     }
 }
