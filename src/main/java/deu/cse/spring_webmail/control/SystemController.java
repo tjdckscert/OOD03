@@ -390,4 +390,13 @@ public class SystemController {
         log.debug("admin_modify_user called");
         return "admin/admin_modify_user";
     }
+
+    /**
+     * 사용자 비밀번호 변경 페이지 이동
+     */
+    @GetMapping("/modify_user")
+    public String modifyUser(Model model) {
+        log.debug("modify_user called");
+        return "/modify_user";
+    }
 }
