@@ -342,7 +342,7 @@ public class SystemController {
     public String signUp() {
         return "/sign_up";
     }
-    
+
     /**
      * 회원 가입 수행
      *
@@ -362,7 +362,7 @@ public class SystemController {
             String cwd = ctx.getRealPath(".");
             UserAdminAgent agent = new UserAdminAgent(JAMES_HOST, JAMES_CONTROL_PORT, cwd,
                     ROOT_ID, ROOT_PASSWORD, ADMINISTRATOR);
-            
+
             if (pw.equals(check_pw)) {
                 if (agent.addUser(id, pw)) {
                     attrs.addFlashAttribute("msg", String.format("회원가입에 성공하였습니다."));
@@ -380,5 +380,14 @@ public class SystemController {
         }
 
         return url;
+    }
+
+    /**
+     * 관리자 비밀번호 변경 페이지 이동
+     */
+    @GetMapping("/admin_modify_user")
+    public String adminModifyUser(Model model) {
+        log.debug("admin_modify_user called");
+        return "admin/admin_modify_user";
     }
 }
