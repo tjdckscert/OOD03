@@ -206,6 +206,47 @@ public class UserAdminAgent {
         }
     }  // deleteUsers()
 
+    /**
+     * james에서 비밀번호 변경 하기
+     *
+     * @param userId 사용자 아이디
+     * @param newPassword 새로운 비밀번호
+     * @return
+     */
+    public boolean setPassword(String userId, String newPassword) {
+        byte[] messageBuffer = new byte[1024];
+        String command;
+        String recvMessage;
+        boolean status = false;
+
+        if (!isConnected) {
+            return status;
+        }
+
+        try {
+            // 1: "setpassword" 명령 송신
+            command = "setpassword " + userId + " " + newPassword + EOL;
+            os.write(command.getBytes());
+            log.debug(command);
+
+            // 2: 응답 메시지 수신
+            java.util.Arrays.fill(messageBuffer, (byte) 0);
+            is.read(messageBuffer);
+
+            // 3: 응답 메시지 분석
+            recvMessage = new String(messageBuffer);
+            log.debug("recvMessage = {}", recvMessage);
+            if (recvMessage.contains("Ok")) {
+                status = true;
+            }
+            quit();
+        } catch (Exception ex) {
+            log.error("setPassword(): 예외 = {}", ex.getMessage());
+        } finally {
+            return status;
+        }
+    }
+
     public boolean verify(String userid) {
         boolean status = false;
         byte[] messageBuffer = new byte[1024];

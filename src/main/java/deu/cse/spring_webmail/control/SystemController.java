@@ -399,4 +399,38 @@ public class SystemController {
         log.debug("modify_user called");
         return "/modify_user";
     }
+
+    
+    /**
+     * 비밀번호 변경 수행
+     * @param password 비밀번호
+     * @param confirmPassword 비밀번호 확인
+     * @return 리다이렉트
+     */
+    @PostMapping("modify_user.do")
+    public String modifyUserDo(@RequestParam("password") String password, @RequestParam("confirmPassword") String confirmPassword, RedirectAttributes attrs) {
+        String userId = (String) session.getAttribute("userid");
+        
+        String url = userId.equals("admin") ? "redirect:/admin_menu" : "redirect:/main_menu";
+        
+        String msg;
+        if (!password.equals(confirmPassword) || password.matches("\\s*") || confirmPassword.matches("\\s*")) {
+            msg = "비밀번호와 확인 비밀번호가 일치하지 않습니다.";
+        } else {
+            try {
+                String cwd = ctx.getRealPath(".");
+                UserAdminAgent agent = new UserAdminAgent(JAMES_HOST, JAMES_CONTROL_PORT, cwd, ROOT_ID, ROOT_PASSWORD, ADMINISTRATOR);
+                agent.setPassword(userId, password);
+                msg = String.format("사용자(%s) 비밀번호를 변경하였습니다.", userId);
+                session.invalidate();
+                url = "redirect:/";  // redirect: 반드시 넣어야만 컨텍스트 루트로 갈 수 있음
+            } catch (Exception ex) {
+                msg = String.format("사용자(%s) 비밀번호 변경에 실패하였습니다.", userId);
+                log.error("modify_user.do : 예외 = {}", ex);
+            }
+        }
+
+        attrs.addFlashAttribute("msg", msg);
+        return url;
+    }
 }
