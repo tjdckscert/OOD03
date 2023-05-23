@@ -421,7 +421,7 @@ public class SystemController {
                 String cwd = ctx.getRealPath(".");
                 UserAdminAgent agent = new UserAdminAgent(JAMES_HOST, JAMES_CONTROL_PORT, cwd, ROOT_ID, ROOT_PASSWORD, ADMINISTRATOR);
                 agent.setPassword(userId, password);
-                msg = String.format("사용자(%s) 비밀번호를 변경하였습니다.", userId);
+                msg = String.format("사용자(%s) 비밀번호를 변경하였습니다. 다시 로그인 해주세요", userId);
                 session.invalidate();
                 url = "redirect:/";  // redirect: 반드시 넣어야만 컨텍스트 루트로 갈 수 있음
             } catch (Exception ex) {
