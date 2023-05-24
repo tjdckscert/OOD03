@@ -28,6 +28,9 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 public class TrashController {
 
     @Autowired
+    private HttpServletRequest request;
+
+    @Autowired
     private TrashService trashService;
 
     /**
@@ -57,5 +60,17 @@ public class TrashController {
         trashService.deleteMail(trashId);
         attrs.addFlashAttribute("msg", "메일이 완전 삭제 되었습니다.");
         return "redirect:/trash_mail";
+    }
+
+    /**
+     * 휴지통에서 메일 읽기 수행 페이지 이동
+     *
+     * @return 휴지통 해당 메일 상세 보기
+     */
+    @GetMapping("/trash_mail/{trashId}")
+    public String showTrashMail(@PathVariable("trashId") Long trashId, Model model) {
+        String msg = trashService.getMessage(trashId, request);
+        model.addAttribute("msg", msg);
+        return "/read_mail/show_trash_message";
     }
 }
