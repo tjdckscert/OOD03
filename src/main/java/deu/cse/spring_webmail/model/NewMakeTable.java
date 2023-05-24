@@ -54,8 +54,7 @@ public class NewMakeTable {
                     + subject +"</td>"
                     + " <td id=date>" + inbox.getLastUpdated()+ "</td>"
                     + " <td id=delete>"
-                    + "<a href=delete_mail.do"
-                    + "?msgid=" + (i + 1) + "> 삭제 </a>" + "</td>"
+                    + "<a href=\"delete_mail.do?msgid=" + (i + 1)+"\" onclick=\"return confirm('정말로 삭제하시겠습니까?');\"> 삭제 </a>" + "</td>"
                     + " <td id=is read>"+ readMark+"</td>"
                     + " </tr>");
         }
