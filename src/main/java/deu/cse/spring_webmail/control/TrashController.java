@@ -73,4 +73,21 @@ public class TrashController {
         model.addAttribute("msg", msg);
         return "/read_mail/show_trash_message";
     }
+    
+    /**
+     * 휴지통에서 해당 메일을 메일함으로 복구 기능 
+     * @return 사용자 메인페이지로 리다이렉트
+     */
+    @GetMapping("/trash_mail/restore/{trashId}")
+    public String restoreMail(@PathVariable("trashId") Long trashId, RedirectAttributes attrs) {
+        boolean sendSuccessful = trashService.restoreMail(trashId);
+        trashService.deleteMail(trashId);
+        if (sendSuccessful) {
+            attrs.addFlashAttribute("msg", "메일 복구 성공했습니다.");
+        } else {
+            attrs.addFlashAttribute("msg", "메일 복구 실패했습니다.");
+        }
+
+        return "redirect:/main_menu";
+    }
 }

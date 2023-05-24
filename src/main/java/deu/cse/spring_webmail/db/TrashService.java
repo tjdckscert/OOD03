@@ -1,15 +1,20 @@
 package deu.cse.spring_webmail.db;
 
 import deu.cse.spring_webmail.dto.TrashDTO;
+import deu.cse.spring_webmail.model.SmtpAgent;
+import java.io.File;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import javax.servlet.ServletContext;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
 import javax.transaction.Transactional;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.web.multipart.MultipartFile;
 
 @Service
 @Slf4j
@@ -20,6 +25,12 @@ public class TrashService {
 
     @Autowired
     private TrashRepository trashRepository;
+        
+    @Autowired
+    private ServletContext ctx;
+    
+    @Value("${file.upload_folder}")
+    private String UPLOAD_FOLDER;
 
     public List<TrashDTO> getTrashListByToAddress(String userId) {
         List<Trash> trashList = trashRepository.findByToAddress(userId);
@@ -84,5 +95,48 @@ public class TrashService {
         }
 
         return buffer.toString();
+    }
+    
+    /**
+     * 휴지통 메일을 복구하는 기능
+     * @param trashId
+     * @return 
+     */
+    public boolean restoreMail(Long trashId) {
+        Optional<Trash> optionalTrash = trashRepository.findById(trashId);
+        if (optionalTrash.isPresent()) {
+            Trash trash = optionalTrash.get();
+            return restoreMessage(trash.getToAddress(),trash.getFromAddress(), trash.getCcAddress(), trash.getSubject(), trash.getBody(), null);
+        }
+        return false;
+    }
+    
+    private boolean restoreMessage(String to,String from, String cc, String subject, String body, MultipartFile upFile) {
+        boolean status = false;
+
+        // 3. HttpSession 객체에서 메일 서버, 메일 사용자 ID 정보 얻기
+        String host = (String) session.getAttribute("host");
+        String userid = (String) session.getAttribute("userid");
+
+        // 4. SmtpAgent 객체에 메일 관련 정보 설정
+        SmtpAgent agent = new SmtpAgent(host, userid);
+        agent.setTo(to);
+        agent.setFrom(from);
+        agent.setCc(cc);
+        agent.setSubj(subject);
+        agent.setBody(body);
+        String fileName = null;
+
+        if (fileName != null && !"".equals(fileName)) {
+            log.debug("sendMessage: 파일({}) 첨부 필요", fileName);
+            File f = new File(ctx.getRealPath(UPLOAD_FOLDER) + File.separator + fileName);
+            agent.setFile1(f.getAbsolutePath());
+        }
+
+        // 5. 메일 전송 권한 위임
+        if (agent.sendMessageByTrash()) {//
+            status = true;
+        }
+        return status;
     }
 }
