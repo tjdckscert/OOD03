@@ -15,6 +15,8 @@ import org.springframework.context.annotation.PropertySource;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 /**
  *
@@ -42,5 +44,18 @@ public class TrashController {
         model.addAttribute("start", trashDTOList.size());
         model.addAttribute("trashList", trashDTOList);
         return "trash_mail";
+    }
+
+    /**
+     * 휴지통 메일 완전 삭제 수행
+     *
+     * @param trashId 휴지통 메일 id
+     * @return 휴지통으로 리다이렉트
+     */
+    @GetMapping("/trash_mail/delete/{trashId}")
+    public String deleteMail(@PathVariable("trashId") Long trashId, RedirectAttributes attrs) {
+        trashService.deleteMail(trashId);
+        attrs.addFlashAttribute("msg", "메일이 완전 삭제 되었습니다.");
+        return "redirect:/trash_mail";
     }
 }

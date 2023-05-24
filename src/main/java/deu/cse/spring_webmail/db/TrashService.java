@@ -6,6 +6,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import java.util.ArrayList;
 import java.util.List;
+import javax.transaction.Transactional;
 
 @Service
 @Slf4j
@@ -30,4 +31,13 @@ public class TrashService {
         return trashDTOList;
     }
 
+    /**
+     * 휴지통에서 메일 완전 삭제 수행
+     *
+     * @param trashId 휴지통 메일 id
+     */
+    @Transactional
+    public void deleteMail(Long trashId) {
+        trashRepository.deleteById(trashId);
+    }
 }
