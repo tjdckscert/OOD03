@@ -1,8 +1,7 @@
 * { box-sizing:border-box; }
 
 /* basic stylings ------------------------------------------ */
-.container 		{ 
-  font-family:'Roboto';
+.container 		{
   width:600px; 
   margin:30px auto 0; 
   display:block; 
