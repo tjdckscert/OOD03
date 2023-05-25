@@ -29,6 +29,10 @@
             <form method="POST" action="signup.do" name="SignUp" >
                 <table>
                     <tr>
+                        <th> 정보 </th>
+                        <th> 입력 </th>
+                    </tr>
+                    <tr>
                         <td style="text-align: right;">아이디 :</td>
                         <td><input type="text" name="id"></td>
                     </tr>
