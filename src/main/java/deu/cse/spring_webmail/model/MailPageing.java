@@ -1,6 +1,6 @@
 package deu.cse.spring_webmail.model;
 
-import deu.cse.spring_webmail.Entity.Inbox;
+import deu.cse.spring_webmail.entity.Inbox;
 import java.util.List;
 
 /**

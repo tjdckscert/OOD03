@@ -4,8 +4,8 @@
  */
 package deu.cse.spring_webmail.model;
 
-import deu.cse.spring_webmail.Entity.Category;
-import deu.cse.spring_webmail.Entity.Inbox;
+import deu.cse.spring_webmail.entity.Category;
+import deu.cse.spring_webmail.entity.Inbox;
 import deu.cse.spring_webmail.Repository.InboxRepository;
 import java.util.List;
 import lombok.NoArgsConstructor;
