@@ -8,7 +8,7 @@
 
 <!DOCTYPE html>
 
-<html>
+<html lang="ko">
     <head>
         <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
         <title>비밀번호 수정 화면</title>
@@ -31,7 +31,7 @@
         <div id="main">
             <h2> 비밀번호 수정 메뉴입니다. </h2> <br>
             <form name="ModifyUser" action="modify_user.do" method="POST">
-                <table border="0" align="left">
+                <table border="0" align="left" summary="수정테이블">
                     <tr>
                         <td>새 비밀번호:</td>
                         <td> <input type="password" id="password" name="password">  </td>

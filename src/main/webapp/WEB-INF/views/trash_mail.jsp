@@ -35,7 +35,7 @@
 
         <div id="main">
             <h2> 휴지통</h2>
-            <table>
+            <table summary="휴지통">
                 <caption>휴지통 메일</caption>
                 <tr>
                     <th> No.</th>
