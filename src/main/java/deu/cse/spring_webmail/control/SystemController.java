@@ -12,29 +12,24 @@ import deu.cse.spring_webmail.model.MailPageing;
 import deu.cse.spring_webmail.model.NewMakeTable;
 import deu.cse.spring_webmail.model.Pop3Agent;
 import deu.cse.spring_webmail.model.UserAdminAgent;
-import java.awt.image.BufferedImage;
-import java.io.ByteArrayOutputStream;
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.util.List;
-import javax.imageio.ImageIO;
-import javax.servlet.ServletContext;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpSession;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.PropertySource;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
+
+import javax.imageio.ImageIO;
+import javax.servlet.ServletContext;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpSession;
+import java.awt.image.BufferedImage;
+import java.io.ByteArrayOutputStream;
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.util.List;
 
 /**
  * 초기 화면과 관리자 기능(사용자 추가, 삭제)에 대한 제어기
@@ -363,11 +358,19 @@ public class SystemController {
             UserAdminAgent agent = new UserAdminAgent(JAMES_HOST, JAMES_CONTROL_PORT, cwd,
                     ROOT_ID, ROOT_PASSWORD, ADMINISTRATOR);
 
+            String passwordErrorMessage = PasswordValidator.validatePassword(pw);
+
             if (pw.equals(check_pw)) {
-                if (agent.addUser(id, pw)) {
-                    attrs.addFlashAttribute("msg", String.format("회원가입에 성공하였습니다."));
+                // 비밀번호 유효성(규칙) 검사
+                if (passwordErrorMessage == null) {
+                    if (agent.addUser(id, pw)) {
+                        attrs.addFlashAttribute("msg", String.format("회원가입에 성공하였습니다."));
+                    } else {
+                        attrs.addFlashAttribute("msg", String.format("이미 사용자가 존재합니다."));
+                        url += "sign_up";
+                    }
                 } else {
-                    attrs.addFlashAttribute("msg", String.format("이미 사용자가 존재합니다."));
+                    attrs.addFlashAttribute("msg", passwordErrorMessage);
                     url += "sign_up";
                 }
             } else {
