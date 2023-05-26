@@ -4,6 +4,7 @@
 --%>
 
 <%@page contentType="text/html" pageEncoding="UTF-8"%>
+<%@page errorPage="../error_page/show_error.jsp" %>
 
 <!DOCTYPE html>
 
