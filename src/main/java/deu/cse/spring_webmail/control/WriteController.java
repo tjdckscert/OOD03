@@ -7,12 +7,6 @@ package deu.cse.spring_webmail.control;
 import deu.cse.spring_webmail.Entity.IsRead;
 import deu.cse.spring_webmail.Repository.IsReadRepository;
 import deu.cse.spring_webmail.model.SmtpAgent;
-import java.io.BufferedOutputStream;
-import java.io.File;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import javax.servlet.ServletContext;
-import javax.servlet.http.HttpSession;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -24,6 +18,14 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
+import org.springframework.web.util.HtmlUtils;
+
+import javax.servlet.ServletContext;
+import javax.servlet.http.HttpSession;
+import java.io.BufferedOutputStream;
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
 
 /**
  * 메일 쓰기를 위한 제어기
@@ -53,15 +55,22 @@ public class WriteController {
         session.removeAttribute("sender");  // 220612 LJM - 메일 쓰기 시는 
         return "write_mail/write_mail";
     }
-    
+
     @PostMapping("/write_mail.do")
-    public String writeMailDo(@RequestParam String to, @RequestParam String cc, 
-            @RequestParam String subj, @RequestParam String body, 
-            @RequestParam(name="file1") MultipartFile upFile,
-            RedirectAttributes attrs, Model model) {
-        String url ="";
-        if (body.length()>200) {
-            model.addAttribute("msg","전송실패 : 메일의 글자 수는 200자를 넘을 수 없습니다.");            
+    public String writeMailDo(@RequestParam String to, @RequestParam String cc,
+                              @RequestParam String subj, @RequestParam String body,
+                              @RequestParam(name = "file1") MultipartFile upFile,
+                              RedirectAttributes attrs, Model model) {
+
+        // XSS 차단
+        to = HtmlUtils.htmlEscape(to);
+        cc = HtmlUtils.htmlEscape(cc);
+        subj = HtmlUtils.htmlEscape(subj);
+        body = HtmlUtils.htmlEscape(body);
+
+        String url = "";
+        if (body.length() > 200) {
+            model.addAttribute("msg", "전송실패 : 메일의 글자 수는 200자를 넘을 수 없습니다.");
             model.addAttribute("body", body);
             model.addAttribute("to", to);
             model.addAttribute("cc", cc);

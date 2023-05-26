@@ -5,6 +5,7 @@
 
 <%@page contentType="text/html" pageEncoding="UTF-8"%>
 <%@page import="deu.cse.spring_webmail.control.CommandType" %>
+<%@page errorPage="../error_page/show_error.jsp" %>
 
 <!DOCTYPE html>
 
