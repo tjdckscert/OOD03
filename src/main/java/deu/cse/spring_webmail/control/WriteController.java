@@ -65,7 +65,7 @@ public class WriteController {
             model.addAttribute("body", body);
             model.addAttribute("to", to);
             model.addAttribute("cc", cc);
-            model.addAttribute("subject", subj);
+            model.addAttribute("subj", subj);
 //            return "write_mail/write_mail";
          return "write_mail/write_mail";
         }

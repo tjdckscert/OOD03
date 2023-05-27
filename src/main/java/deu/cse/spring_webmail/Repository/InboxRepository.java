@@ -27,7 +27,7 @@ public interface InboxRepository extends JpaRepository<Inbox, Integer> {
     
 //    public Page<Inbox> findByRecipients(String recipients, Pageable pageable);
     
-    public List<Inbox> findBySenderOrderByLastUpdated(String sender);
+    public List<Inbox>findBySenderOrderByLastUpdated (String sender);
     
     public List<Inbox> findBySenderAndLastUpdated(String sender, String lastUpdated);
 }
