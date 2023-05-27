@@ -4,8 +4,8 @@
  */
 package deu.cse.spring_webmail.control;
 
-import deu.cse.spring_webmail.Entity.Category;
-import deu.cse.spring_webmail.Entity.Inbox;
+import deu.cse.spring_webmail.entity.Category;
+import deu.cse.spring_webmail.entity.Inbox;
 import deu.cse.spring_webmail.Repository.CategoryRepository;
 import deu.cse.spring_webmail.Repository.InboxRepository;
 import deu.cse.spring_webmail.model.MailPageing;

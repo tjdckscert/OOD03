@@ -4,7 +4,7 @@
  */
 package deu.cse.spring_webmail.Repository;
 
-import deu.cse.spring_webmail.Entity.IsRead;
+import deu.cse.spring_webmail.entity.IsRead;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 /**

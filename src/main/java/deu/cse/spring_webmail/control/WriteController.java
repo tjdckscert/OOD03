@@ -4,7 +4,7 @@
  */
 package deu.cse.spring_webmail.control;
 
-import deu.cse.spring_webmail.Entity.IsRead;
+import deu.cse.spring_webmail.entity.IsRead;
 import deu.cse.spring_webmail.Repository.IsReadRepository;
 import deu.cse.spring_webmail.model.SmtpAgent;
 import lombok.extern.slf4j.Slf4j;
@@ -74,7 +74,7 @@ public class WriteController {
             model.addAttribute("body", body);
             model.addAttribute("to", to);
             model.addAttribute("cc", cc);
-            model.addAttribute("subject", subj);
+            model.addAttribute("subj", subj);
 //            return "write_mail/write_mail";
          return "write_mail/write_mail";
         }
