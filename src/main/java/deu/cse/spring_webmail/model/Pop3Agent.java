@@ -10,6 +10,7 @@ import jakarta.mail.Folder;
 import jakarta.mail.Message;
 import jakarta.mail.Session;
 import jakarta.mail.Store;
+import java.util.ArrayList;
 import java.util.Properties;
 import javax.servlet.http.HttpServletRequest;
 import lombok.Getter;
@@ -24,24 +25,44 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 @NoArgsConstructor        // 기본 생성자 생성
 public class Pop3Agent {
-    @Getter @Setter private String host;
-    @Getter @Setter private String userid;
-    @Getter @Setter private String password;
-    @Getter @Setter private Store store;
-    @Getter @Setter private String excveptionType;
-    @Getter @Setter private HttpServletRequest request;
-    
+
+    @Getter
+    @Setter
+    private String host;
+    @Getter
+    @Setter
+    private String userid;
+    @Getter
+    @Setter
+    private String password;
+    @Getter
+    @Setter
+    private Store store;
+    @Getter
+    @Setter
+    private String excveptionType;
+    @Getter
+    @Setter
+    private HttpServletRequest request;
+    @Getter
+    @Setter
+    private ImportantMessageAgent importantMessageAgent = ImportantMessageAgent.getInstance();
+
     // 220612 LJM - added to implement REPLY
-    @Getter private String sender;
-    @Getter private String subject;
-    @Getter private String body;
-    
+    @Getter
+    private String sender;
+    @Getter
+    private String subject;
+    @Getter
+    private String body;
+
     public Pop3Agent(String host, String userid, String password) {
         this.host = host;
         this.userid = userid;
         this.password = password;
+        this.importantMessageAgent = ImportantMessageAgent.getInstance(userid);
     }
-    
+
     public boolean validate() {
         boolean status = false;
 
@@ -178,5 +199,46 @@ public class Pop3Agent {
             return status;
         }
     }
-    
+        
+        
+
+    public String getImportantMessageList() {
+        String result = "";
+        Message[] messages = null;
+
+        if (!connectToStore()) {
+            System.err.println("POP3 connection failed!");
+            return "POP3 연결이 되지 않아 메일 목록을 볼 수 없습니다.";
+        }
+
+        try {
+            // 메일 폴더 열기
+            Folder folder = store.getFolder("INBOX");  // 3.2
+            folder.open(Folder.READ_ONLY);  // 3.3
+
+            // 현재 수신한 메시지 모두 가져오기
+            messages = folder.getMessages();      // 3.4
+            FetchProfile fp = new FetchProfile();
+            // From, To, Cc, Bcc, ReplyTo, Subject & Date
+            fp.add(FetchProfile.Item.ENVELOPE);
+            folder.fetch(messages, fp);
+
+            FetchProfile fpFlags = new FetchProfile();
+            // From, To, Cc, Bcc, ReplyTo, Subject & Date
+            fp.add(FetchProfile.Item.FLAGS);
+            folder.fetch(messages, fpFlags);
+
+            MessageFormatter formatter = new MessageFormatter(userid);  //3.5
+            ArrayList<Message> importantMessages = importantMessageAgent.getMessageList(messages);
+            result = formatter.getImportantMessageTable(importantMessages);   // 3.6
+            folder.close(true);  // 3.7
+            store.close();       // 3.8
+        } catch (Exception ex) {
+            System.out.println("Pop3Agent.getImportantMessageList() : exception = " + ex);
+            result = "Pop3Agent.getImportantMessageList() : exception = " + ex;
+        }
+        return result;
+
+    }
+
 }
