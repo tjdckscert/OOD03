@@ -17,9 +17,7 @@ import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.sql.SQLException;
 import javax.servlet.ServletContext;
-import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
@@ -38,6 +36,7 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
+
 
 /**
  *
@@ -147,13 +146,12 @@ public class ReadController {
     // 중요 메일
      @GetMapping("/Important_mail")
     protected void processRequest(HttpServletRequest request, HttpServletResponse response)
-            throws ServletException, IOException, SQLException, ClassNotFoundException {
+            throws IOException {
         response.setContentType("text/html;charset=UTF-8");
 
         request.setCharacterEncoding("UTF-8");
-        int select = Integer.parseInt((String) request.getParameter("menu"));
+        int select = Integer.parseInt( request.getParameter("menu"));
         HttpSession session = request.getSession();
-        String userid = (String) session.getAttribute("userid");
         
         switch (select) {
             
@@ -176,7 +174,7 @@ public class ReadController {
             // 중요 메일 설정
             case CommandType.SET_IMPORTANT: 
                 try (PrintWriter out = response.getWriter()) {
-                int msgid = Integer.parseInt((String) request.getParameter("msgid"));
+                int msgid = Integer.parseInt(request.getParameter("msgid"));
                 if (importantMessageAgent.addMessage(msgid)) {
                     //bookmarking 성공
                     out.println(/*"userid : "+userid+"님, "+msgid+"번 메일*/"<script>alert('중요 메일 설정되었습니다.');location.href='main_menu.jsp'</script>");
@@ -192,7 +190,7 @@ public class ReadController {
             // 중요 메일 취소
             case CommandType.CANCLE_IMPORTANT: 
                 try (PrintWriter out = response.getWriter()) {
-                int msgid = Integer.parseInt((String) request.getParameter("msgid"));
+                int msgid = Integer.parseInt( request.getParameter("msgid"));
                 System.out.println("request.getParameter msgid  : " + Integer.toString(msgid));
                 if (importantMessageAgent.removeMessage(msgid)) {
                     //bookmarking 성공
@@ -213,16 +211,15 @@ public class ReadController {
         }
     }
     private boolean deleteMessage(HttpServletRequest request) {
-        int msgid = Integer.parseInt((String) request.getParameter("msgid"));
+        int msgid = Integer.parseInt( request.getParameter("msgid"));
 
         HttpSession httpSession = request.getSession();
         String host = (String) httpSession.getAttribute("host");
         String userid = (String) httpSession.getAttribute("userid");
         String password = (String) httpSession.getAttribute("password");
 
-        //System.out.println();
+       
         Pop3Agent pop3 = new Pop3Agent(host, userid, password);
-        boolean status = pop3.deleteMessage(msgid, true);
-        return status;
+        return (boolean)pop3.deleteMessage(msgid, true);
     }
 }

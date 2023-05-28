@@ -5,7 +5,6 @@
 package deu.cse.spring_webmail.model;
 
 import java.util.ArrayList;
-//import javax.mail.Message;
 import jakarta.mail.Message;
 /**
  *
@@ -15,7 +14,7 @@ public abstract class MessageAgent {
     private boolean needUpdate = false;
     private ArrayList<Integer> msgIdList = new ArrayList();
 
-    public MessageAgent() {
+    protected MessageAgent() {
     }
     
     public void printMsgIdInfo() {
@@ -56,7 +55,7 @@ public abstract class MessageAgent {
     }
 
     protected int getMsgIdValue(int index) {
-        return (Integer)this.msgIdList.get(index);
+        return this.msgIdList.get(index);
     }
 
     protected void resetMsgIdList() {

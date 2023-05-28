@@ -47,7 +47,6 @@ public class ImportantMessageAgent extends MessageAgent {
         Connection conn = null;
         PreparedStatement pstmt = null;
 
-        // 유저아이디 값이 설정x return false;
         if (this.isUserIdNull()) {
             return status;
         }
@@ -105,12 +104,12 @@ public class ImportantMessageAgent extends MessageAgent {
                 needInitialize = false;
             }
 
-            if (super.isNeedUpdate()) {     
-                if (getMsgIdListFromDB()) {               
+            if (super.isNeedUpdate()) {
+                if (getMsgIdListFromDB()) {
                     ImportantMessage = filter(messages, super.getMsgIdList());
                     return ImportantMessage;
                 }
-            } else {                        
+            } else {
                 ImportantMessage = filter(messages, super.getMsgIdList());
                 return ImportantMessage;
             }
@@ -255,17 +254,16 @@ public class ImportantMessageAgent extends MessageAgent {
     private boolean isUserIdNull() {
         if (userid == null || userid.equals("")) {
             return true;
-        } else {
-            return false;
         }
+        return false;
+
     }
 
     public void updateMsgId(int deletedMsgid) {
-        for (int i = 0; i > this.getMsgIdSize();) {
+        for (int i = 0; i > this.getMsgIdSize();++i) {
             if (getMsgIdValue(i) > deletedMsgid) {
                 this.updateMsgId(i, getMsgIdValue(i) - 1);
             }
-            i++;
         }
 
         updateImportantListDB(deletedMsgid);
