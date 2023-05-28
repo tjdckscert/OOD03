@@ -260,10 +260,11 @@ public class ImportantMessageAgent extends MessageAgent {
     }
 
     public void updateMsgId(int deletedMsgid) {
-        for (int i = 0; i > this.getMsgIdSize();++i) {
+        for (int i = 0; i > this.getMsgIdSize();) {
             if (getMsgIdValue(i) > deletedMsgid) {
                 this.updateMsgId(i, getMsgIdValue(i) - 1);
             }
+            i++;
         }
 
         updateImportantListDB(deletedMsgid);
