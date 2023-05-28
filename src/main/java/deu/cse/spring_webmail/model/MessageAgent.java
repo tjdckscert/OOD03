@@ -15,7 +15,7 @@ import java.util.logging.Logger;
 public abstract class MessageAgent {
     private boolean needUpdate = false;
     private ArrayList<Integer> msgIdList = new ArrayList();
-    private static final Logger logger = Logger.getLogger(ImportantMessageAgent.class.getName());
+    private static final Logger logger = Logger.getLogger(MessageAgent.class.getName());
 
     protected MessageAgent() {
     }

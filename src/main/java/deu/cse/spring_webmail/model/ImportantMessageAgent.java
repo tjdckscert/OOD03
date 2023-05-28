@@ -295,7 +295,7 @@ public class ImportantMessageAgent extends MessageAgent {
             return status;
 
         } catch (Exception ex) {
-            System.out.println("ImportantMessageAgent.updateImportantListDB error : " + ex);
+            logger.log(Level.SEVERE,"ImportantMessageAgent.updateImportantListDB error : " + ex);
         } finally {
             try {
                 if (pstmt != null) {

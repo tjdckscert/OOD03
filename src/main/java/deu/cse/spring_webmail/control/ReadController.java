@@ -17,6 +17,8 @@ import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javax.servlet.ServletContext;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -48,6 +50,7 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 public class ReadController {
 
     private ImportantMessageAgent importantMessageAgent = ImportantMessageAgent.getInstance();
+    private static final Logger logger = Logger.getLogger(ReadController.class.getName());
     
     @Autowired
     private ServletContext ctx;
@@ -190,7 +193,7 @@ public class ReadController {
             case CommandType.CANCLE_IMPORTANT: 
                 try (PrintWriter out = response.getWriter()) {
                 int msgid = Integer.parseInt( request.getParameter("msgid"));
-                System.out.println("request.getParameter msgid  : " + Integer.toString(msgid));
+                logger.log(Level.INFO,"request.getParameter msgid  : " + Integer.toString(msgid));
                 if (importantMessageAgent.removeMessage(msgid)) {
                     //bookmarking 성공
                     out.println("<script>alert('중요 메일 설정이 취소되었습니다.');location.href='Important_mail.jsp'</script>");
