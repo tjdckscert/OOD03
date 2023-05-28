@@ -4,6 +4,7 @@
 --%>
 
 <%@page contentType="text/html" pageEncoding="UTF-8"%>
+<%@page errorPage="../error_page/show_error.jsp" %>
 
 <!DOCTYPE html>
 
@@ -17,6 +18,9 @@
         <link type="text/css" rel="stylesheet" href="css/main_style.css" />
     </head>
     <body>
+        <script>
+        alert('${msg}');
+    </script>
         <%@include file="../header.jspf"%>
 
         <div id="sidebar">
@@ -29,32 +33,23 @@
                 <table>
                     <tr>
                         <td> 수신 </td>
-                        <td> <input type="text" name="to" size="80"
-                                    value="${!empty param['sender'] ? param['sender'] : ''}"
-            <!--    value=<%=request.getParameter("recv") == null ? "" : request.getParameter("recv")%>  -->
-                        </td>
+                        <td> <input type="text" name="to" size="80" value="${to}"> </td>
                     </tr>
                     <tr>
                         <td>참조</td>
-                        <td> <input type="text" name="cc" size="80">  </td>
+                        <td> <input type="text" name="cc" size="80"  value="${cc}">  </td>
                     </tr>
                     <tr>
                         <td> 메일 제목 </td>
-                        <td> <input type="text" name="subj" size="80" 
-                                    value="${!empty param['sender'] ? "RE: " += sessionScope['subject'] : ''}" >  </td>
+                        <td> <input type="text" name="subj" size="80"
+                                    value="${subj}" >  </td>
                     </tr>
                     <tr>
                         <td colspan="2">본  &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 문</td>
                     </tr>
                     <tr>  <%-- TextArea    --%>
                         <td colspan="2">
-                            <textarea rows="15" name="body" cols="80">${!empty param['sender'] ?
-"
-
-
-
-----
-" += sessionScope['body'] : ''}</textarea> 
+                            <textarea rows="15" name="body" cols="80">${body}</textarea>
                         </td>
                     </tr>
                     <tr>
@@ -73,4 +68,5 @@
 
         <%@include file="../footer.jspf"%>
     </body>
+
 </html>

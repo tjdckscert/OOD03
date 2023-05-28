@@ -4,9 +4,9 @@
  */
 package deu.cse.spring_webmail.Repository;
 
-import deu.cse.spring_webmail.Entity.Category;
+import deu.cse.spring_webmail.entity.Category;
 import java.util.List;
-import java.util.Optional;
+
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;

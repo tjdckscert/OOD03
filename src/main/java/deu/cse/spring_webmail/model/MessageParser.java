@@ -64,9 +64,9 @@ public class MessageParser {
         } catch (Exception ex) {
             log.error("MessageParser.parse() - Exception : {}", ex.getMessage());
             status = false;
-        } finally {
-            return status;
         }
+        return status;
+
     }
 
     private void getEnvelope(Message m) throws Exception {

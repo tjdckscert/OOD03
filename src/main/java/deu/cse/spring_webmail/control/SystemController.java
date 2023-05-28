@@ -4,37 +4,32 @@
  */
 package deu.cse.spring_webmail.control;
 
-import deu.cse.spring_webmail.Entity.Category;
-import deu.cse.spring_webmail.Entity.Inbox;
+import deu.cse.spring_webmail.entity.Category;
+import deu.cse.spring_webmail.entity.Inbox;
 import deu.cse.spring_webmail.Repository.CategoryRepository;
 import deu.cse.spring_webmail.Repository.InboxRepository;
 import deu.cse.spring_webmail.model.MailPageing;
 import deu.cse.spring_webmail.model.NewMakeTable;
 import deu.cse.spring_webmail.model.Pop3Agent;
 import deu.cse.spring_webmail.model.UserAdminAgent;
-import java.awt.image.BufferedImage;
-import java.io.ByteArrayOutputStream;
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.util.List;
-import javax.imageio.ImageIO;
-import javax.servlet.ServletContext;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpSession;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.PropertySource;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
+
+import javax.imageio.ImageIO;
+import javax.servlet.ServletContext;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpSession;
+import java.awt.image.BufferedImage;
+import java.io.ByteArrayOutputStream;
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.util.List;
 
 /**
  * 초기 화면과 관리자 기능(사용자 추가, 삭제)에 대한 제어기
@@ -342,7 +337,7 @@ public class SystemController {
     public String signUp() {
         return "/sign_up";
     }
-    
+
     /**
      * 회원 가입 수행
      *
@@ -362,12 +357,20 @@ public class SystemController {
             String cwd = ctx.getRealPath(".");
             UserAdminAgent agent = new UserAdminAgent(JAMES_HOST, JAMES_CONTROL_PORT, cwd,
                     ROOT_ID, ROOT_PASSWORD, ADMINISTRATOR);
-            
+
+            String passwordErrorMessage = PasswordValidator.validatePassword(pw);
+
             if (pw.equals(check_pw)) {
-                if (agent.addUser(id, pw)) {
-                    attrs.addFlashAttribute("msg", String.format("회원가입에 성공하였습니다."));
+                // 비밀번호 유효성(규칙) 검사
+                if (passwordErrorMessage == null) {
+                    if (agent.addUser(id, pw)) {
+                        attrs.addFlashAttribute("msg", String.format("회원가입에 성공하였습니다."));
+                    } else {
+                        attrs.addFlashAttribute("msg", String.format("이미 사용자가 존재합니다."));
+                        url += "sign_up";
+                    }
                 } else {
-                    attrs.addFlashAttribute("msg", String.format("이미 사용자가 존재합니다."));
+                    attrs.addFlashAttribute("msg", passwordErrorMessage);
                     url += "sign_up";
                 }
             } else {
@@ -379,6 +382,66 @@ public class SystemController {
             log.error("sign_up.do: 시스템 접속에 실패했습니다. 예외 = {}", ex.getMessage());
         }
 
+        return url;
+    }
+
+    /**
+     * 관리자 비밀번호 변경 페이지 이동
+     */
+    @GetMapping("/admin_modify_user")
+    public String adminModifyUser(Model model) {
+        log.debug("admin_modify_user called");
+        return "admin/admin_modify_user";
+    }
+
+    /**
+     * 사용자 비밀번호 변경 페이지 이동
+     */
+    @GetMapping("/modify_user")
+    public String modifyUser(Model model) {
+        log.debug("modify_user called");
+        return "/modify_user";
+    }
+
+    
+    /**
+     * 비밀번호 변경 수행
+     * @param password 비밀번호
+     * @param confirmPassword 비밀번호 확인
+     * @return 리다이렉트
+     */
+    @PostMapping("modify_user.do")
+    public String modifyUserDo(@RequestParam("password") String password, @RequestParam("confirmPassword") String confirmPassword, RedirectAttributes attrs) {
+        String userId = (String) session.getAttribute("userid");
+
+        String url = userId.equals("admin") ? "redirect:/admin_menu" : "redirect:/main_menu";
+
+        String passwordErrorMessage = PasswordValidator.validatePassword(password);
+
+        String msg = null;
+        if (!password.equals(confirmPassword)) {
+            msg = "비밀번호와 확인 비밀번호가 일치하지 않습니다.";
+            attrs.addFlashAttribute("msg", msg);
+        } else {
+            // 비밀번호 유효성(규칙) 검사
+            if (passwordErrorMessage == null) {
+                try {
+                    String cwd = ctx.getRealPath(".");
+                    UserAdminAgent agent = new UserAdminAgent(JAMES_HOST, JAMES_CONTROL_PORT, cwd, ROOT_ID, ROOT_PASSWORD, ADMINISTRATOR);
+                    agent.setPassword(userId, password);
+                    msg = String.format("사용자(%s) 비밀번호를 변경하였습니다. 다시 로그인 해주세요", userId);
+                    attrs.addFlashAttribute("msg", msg);
+                    session.invalidate();
+                    url = "redirect:/";  // redirect: 반드시 넣어야만 컨텍스트 루트로 갈 수 있음
+                } catch (Exception ex) {
+                    msg = String.format("사용자(%s) 비밀번호 변경에 실패하였습니다.", userId);
+                    attrs.addFlashAttribute("msg", msg);
+                    log.error("modify_user.do : 예외 = {}", ex);
+                }
+            } else {
+                attrs.addFlashAttribute("msg", passwordErrorMessage);
+            }
+        }
         return url;
     }
 }

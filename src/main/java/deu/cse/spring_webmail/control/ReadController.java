@@ -4,9 +4,11 @@
  */
 package deu.cse.spring_webmail.control;
 
-import deu.cse.spring_webmail.Entity.Inbox;
+import deu.cse.spring_webmail.entity.Inbox;
 import deu.cse.spring_webmail.Repository.InboxRepository;
 import deu.cse.spring_webmail.model.ImportantMessageAgent;
+import deu.cse.spring_webmail.db.Trash;
+import deu.cse.spring_webmail.db.TrashRepository;
 import deu.cse.spring_webmail.model.Pop3Agent;
 import jakarta.mail.internet.MimeUtility;
 import java.io.File;
@@ -19,6 +21,7 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import java.util.Map;
 import javax.servlet.ServletContext;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -63,8 +66,11 @@ public class ReadController {
     @Value("${file.download_folder}")
     private String DOWNLOAD_FOLDER;
 
+    @Autowired
+    private TrashRepository trashRepository;
+
     @GetMapping("/show_message")
-    public String showMessage(@RequestParam Integer msgid,@RequestParam Boolean isread, @RequestParam String mailIndex, Model model) {
+    public String showMessage(@RequestParam Integer msgid, @RequestParam Boolean isread, @RequestParam String mailIndex, Model model) {
         log.debug("download_folder = {}", DOWNLOAD_FOLDER);
         if (!isread) {
             Inbox inbox = InboxRepository.findById(Integer.parseInt(mailIndex)).orElse(null);
@@ -76,7 +82,7 @@ public class ReadController {
         pop3.setUserid((String) session.getAttribute("userid"));
         pop3.setPassword((String) session.getAttribute("password"));
         pop3.setRequest(request);
-        
+
         String msg = pop3.getMessage(msgid);
         session.setAttribute("sender", pop3.getSender());  // 220612 LJM - added
         session.setAttribute("subject", pop3.getSubject());
@@ -84,7 +90,7 @@ public class ReadController {
         model.addAttribute("msg", msg);
         return "/read_mail/show_message";
     }
-    
+
     @GetMapping("/download")
     public ResponseEntity<Resource> download(@RequestParam("userid") String userId,
             @RequestParam("filename") String fileName) {
@@ -94,7 +100,7 @@ public class ReadController {
         } catch (UnsupportedEncodingException ex) {
             log.error("error");
         }
-        
+
         // 1. 내려받기할 파일의 기본 경로 설정
         String basePath = ctx.getRealPath(DOWNLOAD_FOLDER) + File.separator + userId;
 
@@ -127,23 +133,37 @@ public class ReadController {
 
         return new ResponseEntity<Resource>(resource, headers, HttpStatus.OK);
     }
-    
+
     @GetMapping("/delete_mail.do")
     public String deleteMailDo(@RequestParam("msgid") Integer msgId, RedirectAttributes attrs) {
         log.debug("delete_mail.do: msgid = {}", msgId);
-        
+
         String host = (String) session.getAttribute("host");
         String userid = (String) session.getAttribute("userid");
         String password = (String) session.getAttribute("password");
 
         Pop3Agent pop3 = new Pop3Agent(host, userid, password);
+        pop3.setRequest(request);
+
+        Map<String, String> messageInfo = pop3.getInfoByDeleteMessage(msgId);
         boolean deleteSuccessful = pop3.deleteMessage(msgId, true);
         if (deleteSuccessful) {
             attrs.addFlashAttribute("msg", "메시지 삭제를 성공하였습니다.");
+            // trash 테이블에 삭제한 메시지 정보 추가
+            Trash trash = new Trash();
+            trash.setMsgId(msgId);
+            trash.setToAddress(messageInfo.get("toAddress"));
+            trash.setFromAddress(messageInfo.get("fromAddress"));
+            trash.setCcAddress(messageInfo.get("ccAddress"));
+            trash.setSubject(messageInfo.get("subject"));
+            trash.setSentDate(messageInfo.get("sentDate"));
+            trash.setBody(messageInfo.get("body"));
+            trash.setFileName(messageInfo.get("fileName"));
+            trashRepository.save(trash);
         } else {
             attrs.addFlashAttribute("msg", "메시지 삭제를 실패하였습니다.");
         }
-        
+
         return "redirect:main_menu";
     }
     // 중요 메일

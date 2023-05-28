@@ -8,6 +8,7 @@
 
 <%@taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>
 <%@taglib prefix="fn" uri="http://java.sun.com/jsp/jstl/functions"%>
+<%@page errorPage="error_page/show_error.jsp" %>
 
 <!DOCTYPE html>
 
@@ -20,7 +21,7 @@
 %>
 -->
 
-<html>
+<html lang="ko">
     <head>
         <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
         <title>주메뉴 화면</title>

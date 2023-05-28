@@ -10,6 +10,8 @@ import jakarta.mail.Folder;
 import jakarta.mail.Message;
 import jakarta.mail.Session;
 import jakarta.mail.Store;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Properties;
 import javax.servlet.http.HttpServletRequest;
 import lombok.Getter;
@@ -51,9 +53,8 @@ public class Pop3Agent {
         } catch (Exception ex) {
             log.error("Pop3Agent.validate() error : " + ex);
             status = false;  // for clarity
-        } finally {
-            return status;
         }
+        return status;
     }
 
     public boolean deleteMessage(int msgid, boolean really_delete) {
@@ -81,9 +82,8 @@ public class Pop3Agent {
             status = true;
         } catch (Exception ex) {
             log.error("deleteMessage() error: {}", ex.getMessage());
-        } finally {
-            return status;
         }
+        return status;
     }
 
     /*
@@ -118,9 +118,8 @@ public class Pop3Agent {
         } catch (Exception ex) {
             log.error("Pop3Agent.getMessageList() : exception = {}", ex.getMessage());
             result = "Pop3Agent.getMessageList() : exception = " + ex.getMessage();
-        } finally {
-            return result;
         }
+        return result;
     }
 
     public String getMessage(int n) {
@@ -149,9 +148,47 @@ public class Pop3Agent {
         } catch (Exception ex) {
             log.error("Pop3Agent.getMessageList() : exception = {}", ex);
             result = "Pop3Agent.getMessage() : exception = " + ex;
-        } finally {
+        }
+        return result;
+    }
+    
+    /**
+     * 수신 메일에서 삭제할 메일 상세 정보
+     * @param n
+     * @return 
+     */
+    public Map<String, String> getInfoByDeleteMessage(int n) {
+        Map<String, String> result = new HashMap<>();
+
+        if (!connectToStore()) {
+            log.error("POP3 connection failed!");
             return result;
         }
+
+        try {
+            Folder folder = store.getFolder("INBOX");
+            folder.open(Folder.READ_ONLY);
+
+            Message message = folder.getMessage(n);
+
+            MessageParser parser = new MessageParser(message, userid, request);
+            parser.parse(true);
+
+            result.put("toAddress", parser.getToAddress());
+            result.put("fromAddress", parser.getFromAddress());
+            result.put("ccAddress", parser.getCcAddress());
+            result.put("subject", parser.getSubject());
+            result.put("sentDate", parser.getSentDate());
+            result.put("body", parser.getBody());
+            result.put("fileName", parser.getFileName());
+
+            folder.close(true);
+            store.close();
+        } catch (Exception ex) {
+            log.error("Pop3Agent.getMessageList() : exception = {}", ex);
+            result = null;
+        }
+        return result;
     }
 
     private boolean connectToStore() {
@@ -174,9 +211,8 @@ public class Pop3Agent {
             status = true;
         } catch (Exception ex) {
             log.error("connectToStore 예외: {}", ex.getMessage());
-        } finally {
-            return status;
         }
+        return status;
     }
     
 }
