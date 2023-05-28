@@ -151,7 +151,6 @@ public class ReadController {
 
         request.setCharacterEncoding("UTF-8");
         int select = Integer.parseInt( request.getParameter("menu"));
-        HttpSession session = request.getSession();
         
         switch (select) {
             
@@ -220,6 +219,6 @@ public class ReadController {
 
        
         Pop3Agent pop3 = new Pop3Agent(host, userid, password);
-        return (boolean)pop3.deleteMessage(msgid, true);
+        return pop3.deleteMessage(msgid, true);
     }
 }
