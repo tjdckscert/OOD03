@@ -4,10 +4,9 @@
  */
 package deu.cse.spring_webmail.Repository;
 
-import deu.cse.spring_webmail.Entity.Inbox;
+import deu.cse.spring_webmail.entity.Inbox;
 import java.util.List;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Pageable;
+
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
@@ -28,7 +27,7 @@ public interface InboxRepository extends JpaRepository<Inbox, Integer> {
     
 //    public Page<Inbox> findByRecipients(String recipients, Pageable pageable);
     
-    public List<Inbox> findBySenderOrderByLastUpdated(String sender);
+    public List<Inbox>findBySenderOrderByLastUpdated (String sender);
     
     public List<Inbox> findBySenderAndLastUpdated(String sender, String lastUpdated);
 }

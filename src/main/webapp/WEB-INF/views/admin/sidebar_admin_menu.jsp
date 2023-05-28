@@ -8,7 +8,7 @@
 
 <!DOCTYPE html>
 
-<html>
+<html lang="ko">
     <head>
         <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
         <title>웹메일 시스템 메뉴</title>
@@ -23,6 +23,7 @@
         --%>
         <p><a href="add_user">사용자 추가</a> </p>
         <p><a href="delete_user"> 사용자 제거</a> </p>
+        <p><a href="admin_modify_user"> 비밀번호 수정</a> </p> 
         <p><a href="login.do?menu=<%= CommandType.LOGOUT %>">로그아웃</a></p>
     </body>
 </html>

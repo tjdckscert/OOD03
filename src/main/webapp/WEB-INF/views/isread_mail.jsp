@@ -10,6 +10,8 @@
 <%@taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>
 <%@taglib prefix="fn" uri="http://java.sun.com/jsp/jstl/functions"%>
 
+<%@page errorPage="error_page/show_error.jsp" %>
+
 <!DOCTYPE html>
 
 <!-- 제어기에서 처리하면 로직 관련 소스 코드 제거 가능!
@@ -21,7 +23,7 @@
 %>
 -->
 
-<html>
+<html lang="ko">
     <head>
         <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
         <title>주메뉴 화면</title>

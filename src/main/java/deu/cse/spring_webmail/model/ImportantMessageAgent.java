@@ -24,6 +24,7 @@ public class ImportantMessageAgent extends MessageAgent {
     private static ImportantMessageAgent uniqueInstance = new ImportantMessageAgent();
     private static String userid = null;
     private boolean needInitialize = true;
+    private static final Logger logger = Logger.getLogger(ImportantMessageAgent.class.getName());
 
     public String getUserid() {
         return userid;
@@ -47,7 +48,6 @@ public class ImportantMessageAgent extends MessageAgent {
         Connection conn = null;
         PreparedStatement pstmt = null;
 
-        // 유저아이디 값이 설정x return false;
         if (this.isUserIdNull()) {
             return status;
         }
@@ -75,7 +75,7 @@ public class ImportantMessageAgent extends MessageAgent {
             return status;
 
         } catch (Exception ex) {
-            System.out.println("ImportantMessageAgent.setMsgIdList Error : " + ex);
+            logger.log(Level.SEVERE,"ImportantMessageAgent.setMsgIdList Error : " + ex);
         } finally {
             try {
                 if (pstmt != null) {
@@ -105,17 +105,17 @@ public class ImportantMessageAgent extends MessageAgent {
                 needInitialize = false;
             }
 
-            if (super.isNeedUpdate()) {     
-                if (getMsgIdListFromDB()) {               
+            if (super.isNeedUpdate()) {
+                if (getMsgIdListFromDB()) {
                     ImportantMessage = filter(messages, super.getMsgIdList());
                     return ImportantMessage;
                 }
-            } else {                        
+            } else {
                 ImportantMessage = filter(messages, super.getMsgIdList());
                 return ImportantMessage;
             }
         } catch (Exception ex) {
-            System.out.println("ImportantMessageAgent.getMessageList Error" + ex);
+            logger.log(Level.SEVERE,"ImportantMessageAgent.getMessageList Error" + ex);
         }
         return ImportantMessage;
     }
@@ -125,7 +125,7 @@ public class ImportantMessageAgent extends MessageAgent {
         for (int i = 0; i < msgIdList.size(); i++) {
             ImportantMessage.add(messages[msgIdList.get(i) - 1]);
         }
-        System.out.println("end filterling");
+        logger.log(Level.INFO,"end filterling");
 
         return ImportantMessage;
     }
@@ -154,7 +154,7 @@ public class ImportantMessageAgent extends MessageAgent {
             status = true;
             return status;
         } catch (Exception ex) {
-            System.out.println("ImportantMessageAgent.insertMsgId error : " + ex);
+            logger.log(Level.SEVERE,"ImportantMessageAgent.insertMsgId error : " + ex);
         } finally {
             try {
                 if (pstmt != null) {
@@ -198,7 +198,7 @@ public class ImportantMessageAgent extends MessageAgent {
             return status;
 
         } catch (Exception ex) {
-            System.out.println("ImportantMessageAgent.deleteMsgId error : " + ex);
+            logger.log(Level.SEVERE,"ImportantMessageAgent.deleteMsgId error : " + ex);
         } finally {
             try {
                 if (pstmt != null) {
@@ -229,7 +229,7 @@ public class ImportantMessageAgent extends MessageAgent {
                 return status;
             }
         } catch (Exception ex) {
-            System.out.println("ImportantMessageAgent.addMessage error : " + ex);
+            logger.log(Level.SEVERE,"ImportantMessageAgent.addMessage error : " + ex);
         }
         return status;
 
@@ -246,7 +246,7 @@ public class ImportantMessageAgent extends MessageAgent {
                 return status;
             }
         } catch (Exception ex) {
-            System.out.println("ImportantMessageAgent.removeMessage error : " + ex);
+            logger.log(Level.SEVERE,"ImportantMessageAgent.removeMessage error : " + ex);
         }
         return status;
 
@@ -255,9 +255,9 @@ public class ImportantMessageAgent extends MessageAgent {
     private boolean isUserIdNull() {
         if (userid == null || userid.equals("")) {
             return true;
-        } else {
-            return false;
         }
+        return false;
+
     }
 
     public void updateMsgId(int deletedMsgid) {
@@ -295,7 +295,7 @@ public class ImportantMessageAgent extends MessageAgent {
             return status;
 
         } catch (Exception ex) {
-            System.out.println("ImportantMessageAgent.updateImportantListDB error : " + ex);
+            logger.log(Level.SEVERE,"ImportantMessageAgent.updateImportantListDB error : " + ex);
         } finally {
             try {
                 if (pstmt != null) {

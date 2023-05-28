@@ -33,5 +33,6 @@ public class CommandType {
     public static final String JDBCDRIVER = "org.mariadb.jdbc.Driver";
     public static final String JDBCURL = "jdbc:mariadb://localhost:3306/webmail?serverTime=Asia/Seoul";
     public static final String JDBCUSER = "root";
+    @SuppressWarnings("squid:S2068") // This is not an hard coded password.
     public static final String JDBCPASSWORD = "suyeon";
 }

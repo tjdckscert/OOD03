@@ -5,10 +5,11 @@
 
 <%@page contentType="text/html" pageEncoding="UTF-8"%>
 <%@page import="deu.cse.spring_webmail.control.CommandType" %>
+<%@page errorPage="../error_page/show_error.jsp" %>
 
 <!DOCTYPE html>
 
-<html>
+<html lang="ko">
     <head>
         <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
         <title>사용자 추가 화면</title>
@@ -25,7 +26,7 @@
             추가로 등록할 사용자 ID와 암호를 입력해 주시기 바랍니다. <br> <br>
 
             <form name="AddUser" action="add_user.do" method="POST">
-                <table border="0" align="left">
+                <table border="0" align="left" summary="회원가입 테이블">
                     <tr>
                         <td>사용자 ID</td>
                         <td> <input type="text" name="id" value="" size="20" />  </td>

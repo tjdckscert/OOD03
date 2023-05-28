@@ -5,8 +5,9 @@
 package deu.cse.spring_webmail.model;
 
 import java.util.ArrayList;
-//import javax.mail.Message;
 import jakarta.mail.Message;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 /**
  *
  * @author sooye
@@ -14,17 +15,18 @@ import jakarta.mail.Message;
 public abstract class MessageAgent {
     private boolean needUpdate = false;
     private ArrayList<Integer> msgIdList = new ArrayList();
+    private static final Logger logger = Logger.getLogger(MessageAgent.class.getName());
 
-    public MessageAgent() {
+    protected MessageAgent() {
     }
     
     public void printMsgIdInfo() {
-        System.out.println("생성된 MSGID SIZE = " + this.getMsgIdSize());
-        System.out.print("현재 msgid List = ");
+        logger.log(Level.INFO,"생성된 MSGID SIZE = " + this.getMsgIdSize());
+        logger.log(Level.INFO,"현재 msgid List = ");
         for (int i = 0; i < msgIdList.size(); ++i) {
-            System.out.print(msgIdList.get(i) + " ");
+            logger.log(Level.INFO,msgIdList.get(i) + " ");
         }
-        System.out.print("\n");
+        logger.log(Level.INFO,"\n");
     }
 
     protected boolean isNeedUpdate() {
@@ -56,7 +58,7 @@ public abstract class MessageAgent {
     }
 
     protected int getMsgIdValue(int index) {
-        return (Integer)this.msgIdList.get(index);
+        return this.msgIdList.get(index);
     }
 
     protected void resetMsgIdList() {
