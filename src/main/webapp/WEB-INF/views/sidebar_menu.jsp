@@ -23,6 +23,7 @@
         <p><a href="modify_user"> 비밀번호 수정</a> </p>  
         <p><a href="trash_mail"> 휴지통</a> </p>
         <p> <a href="Important_mail"> 중요메일함 </a> </p>
+        <p> <a href="address"> 주소록 </a> </p>
         <p> <a href="login.do?menu=<%= CommandType.LOGOUT %>">로그아웃</a></p>
         <br>
         <br>       
