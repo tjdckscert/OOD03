@@ -6,20 +6,25 @@ package deu.cse.spring_webmail.control;
 
 import deu.cse.spring_webmail.entity.Inbox;
 import deu.cse.spring_webmail.Repository.InboxRepository;
+import deu.cse.spring_webmail.model.ImportantMessageAgent;
 import deu.cse.spring_webmail.db.Trash;
 import deu.cse.spring_webmail.db.TrashRepository;
 import deu.cse.spring_webmail.model.Pop3Agent;
 import jakarta.mail.internet.MimeUtility;
 import java.io.File;
 import java.io.IOException;
+import java.io.PrintWriter;
 import java.io.UnsupportedEncodingException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import java.util.Map;
 import javax.servlet.ServletContext;
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -37,6 +42,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
+
 /**
  *
  * @author Prof.Jong Min Lee
@@ -46,6 +52,9 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 @Slf4j
 public class ReadController {
 
+    private ImportantMessageAgent importantMessageAgent = ImportantMessageAgent.getInstance();
+    private static final Logger logger = Logger.getLogger(ReadController.class.getName());
+    
     @Autowired
     private ServletContext ctx;
     @Autowired
@@ -156,5 +165,83 @@ public class ReadController {
         }
 
         return "redirect:main_menu";
+    }
+    // 중요 메일
+     @GetMapping("/Important_mail")
+    protected void processRequest(HttpServletRequest request, HttpServletResponse response)
+            throws IOException {
+        response.setContentType("text/html;charset=UTF-8");
+
+        request.setCharacterEncoding("UTF-8");
+        int select = Integer.parseInt( request.getParameter("menu"));
+        
+        switch (select) {
+            
+            // 중요 메일 삭제
+            case CommandType.DELETE_MAIL_COMMAND_IN_IMPORTANT:   
+                try (PrintWriter out = response.getWriter()) {
+                deleteMessage(request);
+                int msgid = Integer.parseInt(request.getParameter("msgid"));
+
+                boolean isSuccess = importantMessageAgent.removeMessage(msgid);
+                if (isSuccess) {
+                    out.println("<script>alert('중요 메일이 삭제되었습니다.');location.href='Important_mail.jsp'</script>");
+                    importantMessageAgent.updateMsgId(msgid);
+                } else {
+                    out.println("<script>alert('중요 메일 삭제를 실패했습니다.');location.href='Important_mail.jsp'</script>");
+                }
+            }
+            break;
+            
+            // 중요 메일 설정
+            case CommandType.SET_IMPORTANT: 
+                try (PrintWriter out = response.getWriter()) {
+                int msgid = Integer.parseInt(request.getParameter("msgid"));
+                if (importantMessageAgent.addMessage(msgid)) {
+                    //bookmarking 성공
+                    out.println(/*"userid : "+userid+"님, "+msgid+"번 메일*/"<script>alert('중요 메일 설정되었습니다.');location.href='main_menu.jsp'</script>");
+                } else {
+                    out.println("<script>alert('중요 메일 설정이 실패했습니다.');location.href='main_menu.jsp'</script>");
+                }
+            } catch (Exception ex) {
+                PrintWriter out = response.getWriter();
+                out.println("ReadmailHandler.cancelImportant error : " + ex);
+            }
+            break;
+            
+            // 중요 메일 취소
+            case CommandType.CANCLE_IMPORTANT: 
+                try (PrintWriter out = response.getWriter()) {
+                int msgid = Integer.parseInt( request.getParameter("msgid"));
+                logger.log(Level.INFO,"request.getParameter msgid  : " + Integer.toString(msgid));
+                if (importantMessageAgent.removeMessage(msgid)) {
+                    //bookmarking 성공
+                    out.println("<script>alert('중요 메일 설정이 취소되었습니다.');location.href='Important_mail.jsp'</script>");
+                } else {
+                    out.println("<script>alert('중요 메일 설정 취소가 실패했습니다.');location.href='Important_mail.jsp'</script>");
+                }
+            } catch (Exception ex) {
+                PrintWriter out = response.getWriter();
+                out.println("ReadmailHandler.cancelImportant error : " + ex);
+            }
+            break;
+            default:
+                try (PrintWriter out = response.getWriter()) {
+                out.println("없는 메뉴입니다");
+            }
+            break;
+        }
+    }
+    private boolean deleteMessage(HttpServletRequest request) {
+        int msgid = Integer.parseInt( request.getParameter("msgid"));
+
+        HttpSession httpSession = request.getSession();
+        String host = (String) httpSession.getAttribute("host");
+        String userid = (String) httpSession.getAttribute("userid");
+        String password = (String) httpSession.getAttribute("password");
+
+       
+        Pop3Agent pop3 = new Pop3Agent(host, userid, password);
+        return pop3.deleteMessage(msgid, true);
     }
 }

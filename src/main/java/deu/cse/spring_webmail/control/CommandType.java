@@ -21,7 +21,18 @@ public class CommandType {
     
     public final static int ADD_USER_COMMAND = 61;
     public final static int DELETE_USER_COMMAND = 62;
+    
+    // 중요 메일 
+    public static final int DELETE_MAIL_COMMAND_IN_IMPORTANT = 411;
+    public static final int SET_IMPORTANT = 801;
+    public static final int CANCLE_IMPORTANT= 800;
 
     public final static int LOGIN = 91;
     public final static int LOGOUT = 92;
+    
+    public static final String JDBCDRIVER = "org.mariadb.jdbc.Driver";
+    public static final String JDBCURL = "jdbc:mariadb://localhost:3306/webmail?serverTime=Asia/Seoul";
+    public static final String JDBCUSER = "root";
+    @SuppressWarnings("squid:S2068") // This is not an hard coded password.
+    public static final String JDBCPASSWORD = "suyeon";
 }
