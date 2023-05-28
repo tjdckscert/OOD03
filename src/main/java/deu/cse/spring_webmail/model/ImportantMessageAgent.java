@@ -198,7 +198,7 @@ public class ImportantMessageAgent extends MessageAgent {
             return status;
 
         } catch (Exception ex) {
-            System.out.println("ImportantMessageAgent.deleteMsgId error : " + ex);
+            logger.log(Level.SEVERE,"ImportantMessageAgent.deleteMsgId error : " + ex);
         } finally {
             try {
                 if (pstmt != null) {
